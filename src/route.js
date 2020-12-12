@@ -6,6 +6,10 @@ const Event = {
     ROUTE_CHANGE: 'ROUTE_CHANGE',
 };
 
+function isCollection(x) {
+    return Array.isArray(x) || x instanceof NodeList || x instanceof HTMLCollection;
+}
+
 class Route {
     constructor() {
         this.eventManager = new EventManager();
@@ -24,15 +28,9 @@ class Route {
             return;
 
         // array-like collection
-        else if (target.length !== undefined) {
+        else if (isCollection(target)) {
             for (let t of target) this.subscribe(t);
         }
-
-        // Router
-        else if (target.dispatchRoute)
-            this.eventManager.addEventListener(Event.ROUTE_CHANGE, handler = event => {
-                target.dispatchRoute(event.path);
-            });
 
         // selector
         else if (typeof target === 'string')
@@ -53,6 +51,12 @@ class Route {
                 }
             });
 
+        // Router
+        else if (target.dispatchRoute)
+            this.eventManager.addEventListener(Event.ROUTE_CHANGE, handler = event => {
+                target.dispatchRoute(event.path);
+            });
+
         if (handler)
             this.subscriptions.push({target, handler});
     }
@@ -60,7 +64,7 @@ class Route {
         if (!target)
             return;
 
-        if (target.length !== undefined) {
+        if (isCollection(target)) {
             for (let t of target) this.unsubscribe(t);
             return;
         }
@@ -71,14 +75,14 @@ class Route {
             if (t !== target)
                 continue;
 
-            if (t.dispatchRoute)
-                this.eventManager.removeEventListener(Event.ROUTE_CHANGE, f);
-
-            else if (typeof t === 'string')
+            if (typeof t === 'string')
                 document.removeEventListener('click', f);
 
             else if (t instanceof HTMLElement)
                 t.removeEventListener('click', f);
+
+            else if (t.dispatchRoute)
+                this.eventManager.removeEventListener(Event.ROUTE_CHANGE, f);
 
             this.subscriptions.splice(i, 1);
         }
