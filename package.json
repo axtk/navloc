@@ -1,0 +1,15 @@
+{
+  "name": "router",
+  "version": "1.0.0",
+  "description": "A lightweight browser history router",
+  "main": "index.js",
+  "keywords": [
+    "router",
+    "history"
+  ],
+  "author": "axtk",
+  "license": "ISC",
+  "dependencies": {
+    "event-manager": "github:axtk/event-manager"
+  }
+}
