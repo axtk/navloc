@@ -4,7 +4,7 @@ import route from './route';
 
 class Router {
     constructor(props = {}) {
-        this.baseRoute = props.baseRoute || '';
+        this.setBaseRoute(props.baseRoute);
 
         this.eventManager = new EventManager({
             shouldCallListener: (listener, event) => {
@@ -37,6 +37,9 @@ class Router {
         });
 
         route.subscribe(this);
+    }
+    setBaseRoute(baseRoute) {
+        this.baseRoute = (baseRoute || '').replace(/\/$/, '');
     }
     matchesBaseRoute(path) {
         const {baseRoute} = this;
