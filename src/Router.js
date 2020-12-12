@@ -8,7 +8,11 @@ class Router {
 
         this.eventManager = new EventManager({
             shouldCallListener: (listener, event) => {
-                let routePattern = listener.type, path = event.type;
+                if (!this.matchesBaseRoute(event.type))
+                    return false;
+
+                let routePattern = listener.type;
+                let path = this.truncateBaseRoute(event.type);
 
                 if (props.shouldCallListener)
                     return props.shouldCallListener.call(this, routePattern, path);
@@ -18,7 +22,8 @@ class Router {
                     routePattern === path;
             },
             toHandlerPayload: (listener, event) => {
-                let routePattern = listener.type, path = event.type;
+                let routePattern = listener.type;
+                let path = this.truncateBaseRoute(event.type);
 
                 if (props.toHandlerPayload)
                     return props.toHandlerPayload.call(this, routePattern, path);
@@ -32,6 +37,20 @@ class Router {
         });
 
         route.subscribe(this);
+    }
+    matchesBaseRoute(path) {
+        const {baseRoute} = this;
+
+        return !baseRoute || path === baseRoute ||
+            (path && ['/', '?', '#'].some(c => path.startsWith(baseRoute + c)));
+    }
+    truncateBaseRoute(path) {
+        const {baseRoute} = this;
+
+        if (!path || !baseRoute || !path.startsWith(baseRoute))
+            return path;
+
+        return path.slice(baseRoute.length);
     }
     addRouteListener(routePattern, handler) {
         return this.eventManager.addEventListener(routePattern, handler);
