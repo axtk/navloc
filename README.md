@@ -89,6 +89,11 @@ Re-sends the current path to instances of the `Router` class.
 
 Subscribes links to the `route` object to enable history navigation without page reloading. The argument is a specific DOM node, or a collection of DOM nodes, or a selector.
 
+```js
+// subscribing existing and future links
+route.subscribe('a');
+```
+
 #### `unsubscribe(target: any)`
 
 Unsubscribes links from the `route` object.
