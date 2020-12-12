@@ -38,7 +38,7 @@ class Route {
                 for (let t = event.target; t; t = t.parentNode) {
                     if (t.matches && t.matches(target) && isNavigable(t)) {
                         event.preventDefault();
-                        this.dispatchRoute(getFullPath(t.href));
+                        this.assign(getFullPath(t));
                     }
                 }
             });
@@ -47,7 +47,7 @@ class Route {
             target.addEventListener('click', handler = event => {
                 if (isNavigable(target)) {
                     event.preventDefault();
-                    this.dispatchRoute(getFullPath(target.href));
+                    this.assign(getFullPath(target));
                 }
             });
 

@@ -1,7 +1,13 @@
-export default location => {
-	let {pathname, search, hash} = location ?
-		new URL(location, window.location.origin) :
-		new URL(window.location.href);
+export default x => {
+	let url;
 
+	if (!x)
+		url = new URL(window.location.href);
+	else if (x.href)
+		url = new URL(x.href);
+	else
+		url = new URL(x, window.location.origin);
+
+	let {pathname, search, hash} = url;
 	return pathname + search + hash;
 };

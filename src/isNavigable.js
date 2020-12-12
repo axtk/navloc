@@ -1,3 +1,1 @@
-import isSameOrigin from './isSameOrigin';
-
-export default e => e.href !== undefined && isSameOrigin(e.href);
+export default e => e.href !== undefined && new URL(e.href).origin === window.location.origin;
