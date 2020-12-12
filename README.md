@@ -113,3 +113,9 @@ Same as `go(-1)`. See [`history.back`](https://developer.mozilla.org/en-US/docs/
 #### `forward()`
 
 Same as `go(1)`. See [`history.forward`](https://developer.mozilla.org/en-US/docs/Web/API/History/forward).
+
+## Installation
+
+```
+npm i github:axtk/router
+```
