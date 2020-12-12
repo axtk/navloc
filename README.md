@@ -17,6 +17,9 @@ Returns an instance of a browser history router, an object that helps control ho
 `props.shouldCallListener?: (routePattern, path) => boolean`<br>
 defines custom route pattern matching.
 
+`props.toHandlerPayload?: (routePattern, path) => any`<br>
+defines the payload that the route handlers will receive.
+
 By default, routes are matched via regular expressions:
 
 ```js
@@ -27,7 +30,7 @@ router.addRouterListener(/^\/\d+$/, ({path, params}) => {
 });
 ```
 
-The `shouldCallListener` option can be used to enable capturing named route parameters:
+The constructor options can be used to enable capturing named route parameters:
 
 ```js
 // @see https://www.npmjs.com/package/route-parser
@@ -39,13 +42,10 @@ const router = new Router({
     },
     toHandlerPayload: (routePattern, path) => ({
         params: new Route(routePattern).match(path),
-        path,
-    }),
+        path
+    })
 });
 ```
-
-`props.toHandlerPayload?: (routePattern, path) => any`<br>
-defines the payload that the route handlers will receive.
 
 ### Methods
 
@@ -65,7 +65,7 @@ Notifies the router of the specified `path`.
 
 #### `setBaseRoute(baseRoute: string)`
 
-Sets the base route.
+Sets the router's base route.
 
 ## `route`
 
