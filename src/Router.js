@@ -7,23 +7,28 @@ class Router {
         this.baseRoute = props.baseRoute || '';
 
         this.eventManager = new EventManager({
-            shouldCallListener: props.shouldCallListener || (
-                (listener, event) => {
-                    if (listener.type instanceof RegExp)
-                        return listener.type.test(event.type);
+            shouldCallListener: (listener, event) => {
+                let routePattern = listener.type, path = event.type;
 
-                    return listener.type === event.type;
-                }
-            ),
-            toHandlerPayload: props.toHandlerPayload || (
-                (listener, event) => {
-                    let params = listener.type instanceof RegExp ?
-                        event.type.match(listener.type) || [] :
-                        [];
+                if (props.shouldCallListener)
+                    return props.shouldCallListener.call(this, routePattern, path);
 
-                    return {params, path: event.type};
-                }
-            ),
+                return routePattern instanceof RegExp ?
+                    routePattern.test(path) :
+                    routePattern === path;
+            },
+            toHandlerPayload: (listener, event) => {
+                let routePattern = listener.type, path = event.type;
+
+                if (props.toHandlerPayload)
+                    return props.toHandlerPayload.call(this, routePattern, path);
+
+                let params = routePattern instanceof RegExp ?
+                    path.match(routePattern) || [] :
+                    [];
+
+                return {params, path};
+            },
         });
 
         route.subscribe(this);
