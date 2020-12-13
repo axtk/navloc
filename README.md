@@ -75,11 +75,11 @@ A singleton providing a [`window.location`](https://developer.mozilla.org/en-US/
 
 #### `assign(path: string)`
 
-Causes the navigation to the specified `path`, as in [`history.pushState`](https://developer.mozilla.org/en-US/docs/Web/API/History/pushState).
+Navigates to the specified `path`, as in [`history.pushState`](https://developer.mozilla.org/en-US/docs/Web/API/History/pushState), and notifies `Router` instances.
 
 #### `replace(path: string)`
 
-Causes the navigation to the specified `path` without saving it on the browser history session, as in [`history.replaceState`](https://developer.mozilla.org/en-US/docs/Web/API/History/replaceState).
+Navigates to the specified `path` without saving it on the browser history session, as in [`history.replaceState`](https://developer.mozilla.org/en-US/docs/Web/API/History/replaceState), and notifies `Router` instances.
 
 #### `reload()`
 
