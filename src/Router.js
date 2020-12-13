@@ -1,5 +1,5 @@
 import EventManager from 'event-manager';
-import getFullPath from './getFullPath';
+import getFullPath from '../lib/getFullPath';
 import route from './route';
 
 class Router {

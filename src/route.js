@@ -1,19 +1,14 @@
 import EventManager from 'event-manager';
-import getFullPath from './getFullPath';
-import isNavigable from './isNavigable';
-
-const Event = {
-    ROUTE_CHANGE: 'ROUTE_CHANGE',
-};
-
-function isCollection(x) {
-    return Array.isArray(x) || x instanceof NodeList || x instanceof HTMLCollection;
-}
+import getFullPath from '../lib/getFullPath';
+import isNavigable from '../lib/isNavigable';
+import isCollection from '../lib/isCollection';
+import Event from '../lib/Event';
 
 class Route {
     constructor() {
         this.eventManager = new EventManager();
         this.subscriptions = [];
+
         window.addEventListener('popstate', () => this.dispatchRoute());
     }
     dispatchRoute(path) {
