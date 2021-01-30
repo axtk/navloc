@@ -65,6 +65,14 @@ router.addListener('/:sectionId', ({path, params}) => {
 - **`.setBaseRoute(baseRoute)`**
   - **`baseRoute: string`**
   - Sets the router's base route.
+- **`.getRoute(path)`**
+  - **`path: string | undefined`**
+  - Returns: **`string | null`**
+  - Returns a route matching the `path` location (or the current location if the `path` is not specified) relative to the router's base route. If the location doesn't match the router's base route, the returned value is `null`.
+- **`.matches(path)`**
+  - **`path: string`**
+  - Returns: **`boolean`**
+  - Checks whether the `path` location matches the router's base route.
 
 ### `route`
 
