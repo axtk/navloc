@@ -13,25 +13,34 @@ An instance of the `Router` class is a browser history router, an object that he
 ```js
 const router = new Router({baseRoute: '/section'});
 
-router.addRouterListener(/^\/\d+$/, ({path, params}) => {
+router.addListener(/^\/\d+$/, ({path, params}) => {
     console.log(path, params);
 });
 ```
 
-By default, routes are matched via regular expressions. With the constructor options, a router can be configured to enable capturing named route parameters:
+By default, routes are matched via regular expressions. A router can be configured to enable capturing named route parameters by overriding its methods:
 
 ```js
+import Router from 'router';
 // @see https://www.npmjs.com/package/route-parser
 import Route from 'route-parser';
 
-const router = new Router({
-    shouldCallListener: (routePattern, path) => {
-        return new Route(routePattern).match(path) !== false;
-    },
-    toHandlerPayload: (routePattern, path) => ({
-        params: new Route(routePattern).match(path),
-        path
-    })
+class PatternRouter extends Router {
+    shouldCallListener(listener, event) {
+        return new Route(listener.type).match(event.type) !== false;
+    }
+    toHandlerPayload(listener, event) {
+        return {
+            path: event.type,
+            params: new Route(listener.type).match(event.type)
+        };
+    }
+}
+
+const router = new PatternRouter({baseRoute: '/section'});
+
+router.addListener('/:sectionId', ({path, params}) => {
+    console.log(path, params);
 });
 ```
 
@@ -40,21 +49,17 @@ const router = new Router({
   - **`props.baseRoute?: string`**
     - A base route, a prefix for all paths handled on this router.
     - Default: `''`.
-  - **`props.shouldCallListener?: (routePattern, path) => boolean`**
-    - Defines the custom route pattern matching.
-  - **`props.toHandlerPayload?: (routePattern, path) => any`**
-    - Defines the payload that the route handlers will receive.
-- **`.addRouteListener(routePattern, handler)`**
+- **`.addListener(routePattern, handler)`**
   - **`routePattern: any`**
   - **`handler: function | function[]`**
   - Returns: **`listener: object | object[]`**
-  - Adds a `handler` (or multiple handlers) to the specified `routePattern`. In the default setting, a route pattern is a `string` or a regular expression. (This can be changed with a custom `shouldCallListener` constructor option.) If a handler is not a function, it is silently ignored.
+  - Adds a `handler` (or multiple handlers) to the specified `routePattern`. In the default setting, a route pattern is a `string` or a regular expression. (This can be changed with a custom `shouldCallListener` method in descendant classes.) If a handler is not a function, it is silently ignored.
   - This method returns a listener object (or an array thereof) with a `remove()` method that removes the listener from the router.
-- **`.removeRouteListener(routePattern, handler?)`**
+- **`.removeListener(routePattern, handler?)`**
   - **`routePattern: any`**
   - **`handler?: function | function[]`**
   - Removes a route listener of the specified `routePattern` and route `handler` (or an array of handlers). If the handler is not specified, all subscriptions to the specified `routePattern` are removed.
-- **`.dispatchRoute(path)`**
+- **`.dispatch(path)`**
   - **`path: string`**
   - Notifies the router of the specified `path`.
 - **`.setBaseRoute(baseRoute)`**
@@ -84,6 +89,10 @@ A singleton object providing a [`window.location`](https://developer.mozilla.org
 - **`.unsubscribe(target)`**
   - **`target: any`**
   - Unsubscribes links from the `route` object.
+- **`.onChange(handler)`**
+  - **`handler: function`**
+  - Returns: **`function | undefined`**
+  - Subscribes the `handler` function to all route changes and returns a function that removes the subscription. If the `handler` is not a function the returned value is `undefined`.
 - **`.toString()`**
   - Returns: **`string`**
   - Returns the current full path.

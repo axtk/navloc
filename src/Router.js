@@ -1,68 +1,35 @@
 import EventManager from 'event-manager';
 import getFullPath from '../lib/getFullPath';
+import getSubpath from '../lib/getSubpath';
 import route from './route';
 
-class Router {
+class Router extends EventManager {
     constructor(props = {}) {
+        super();
         this.setBaseRoute(props.baseRoute);
-
-        this.eventManager = new EventManager({
-            shouldCallListener: (listener, event) => {
-                if (!this.matchesBaseRoute(event.type))
-                    return false;
-
-                let routePattern = listener.type;
-                let path = this.truncateBaseRoute(event.type);
-
-                if (props.shouldCallListener)
-                    return props.shouldCallListener.call(this, routePattern, path);
-
-                return routePattern instanceof RegExp ?
-                    routePattern.test(path) :
-                    routePattern === path;
-            },
-            toHandlerPayload: (listener, event) => {
-                let routePattern = listener.type;
-                let path = this.truncateBaseRoute(event.type);
-
-                if (props.toHandlerPayload)
-                    return props.toHandlerPayload.call(this, routePattern, path);
-
-                let params = routePattern instanceof RegExp ?
-                    path.match(routePattern) || [] :
-                    [];
-
-                return {params, path};
-            },
-        });
-
         route.subscribe(this);
     }
+    shouldCallListener(listener, event) {
+        let routePattern = listener.type, path = event.type;
+        return routePattern instanceof RegExp ? routePattern.test(path) : routePattern === path;
+    }
+    toHandlerPayload(listener, event) {
+        let routePattern = listener.type, path = event.type;
+        let params = routePattern instanceof RegExp ? path.match(routePattern) || [] : [];
+        return {params, path};
+    }
     setBaseRoute(baseRoute) {
-        this.baseRoute = (baseRoute || '').replace(/\/$/, '');
+        this.baseRoute = baseRoute;
     }
-    matchesBaseRoute(path) {
-        const {baseRoute} = this;
-
-        return !baseRoute || path === baseRoute ||
-            (path && ['/', '?', '#'].some(c => path.startsWith(baseRoute + c)));
+    dispatch(path) {
+        let route = this.getRoute(path);
+        return route == null ? undefined : super.dispatch(route);
     }
-    truncateBaseRoute(path) {
-        const {baseRoute} = this;
-
-        if (!path || !baseRoute || !path.startsWith(baseRoute))
-            return path;
-
-        return path.slice(baseRoute.length);
+    getRoute(path = getFullPath()) {
+        return getSubpath(path, this.baseRoute);
     }
-    addRouteListener(routePattern, handler) {
-        return this.eventManager.addEventListener(routePattern, handler);
-    }
-    removeRouteListener(routePattern, handler) {
-        return this.eventManager.removeEventListener(routePattern, handler);
-    }
-    dispatchRoute(path) {
-        return this.eventManager.dispatchEvent(path === undefined ? getFullPath() : path);
+    matches(path) {
+        return getSubpath(path, this.baseRoute) != null;
     }
 }
 

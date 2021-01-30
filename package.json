@@ -3,6 +3,9 @@
   "version": "1.0.4",
   "description": "A lightweight browser history router",
   "main": "index.js",
+  "scripts": {
+    "test": "node -r esm test.js"
+  },
   "keywords": [
     "router",
     "history"
@@ -11,5 +14,8 @@
   "license": "ISC",
   "dependencies": {
     "event-manager": "github:axtk/event-manager"
+  },
+  "devDependencies": {
+    "esm": "^3.2.25"
   }
 }

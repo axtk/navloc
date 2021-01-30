@@ -9,12 +9,14 @@ class Route {
         this.eventManager = new EventManager();
         this.subscriptions = [];
 
-        window.addEventListener('popstate', () => this.dispatchRoute());
+        window.addEventListener('popstate', () => this.dispatch());
     }
-    dispatchRoute(path) {
-        this.eventManager.dispatchEvent(Event.ROUTE_CHANGE, {
-            path: path === undefined ? getFullPath() : path,
-        });
+    dispatch(path = getFullPath()) {
+        this.eventManager.dispatch(Event.ROUTE_CHANGE, {path});
+    }
+    onChange(handler) {
+        if (typeof handler !== 'function') return;
+        return this.eventManager.addListener(Event.ROUTE_CHANGE, handler).remove;
     }
     subscribe(target) {
         let handler;
@@ -46,10 +48,10 @@ class Route {
                 }
             });
 
-        // Router
-        else if (target.dispatchRoute)
-            this.eventManager.addEventListener(Event.ROUTE_CHANGE, handler = event => {
-                target.dispatchRoute(event.path);
+        // routers and other event managers
+        else if (target instanceof EventManager)
+            this.eventManager.addListener(Event.ROUTE_CHANGE, handler = event => {
+                target.dispatch(event.path);
             });
 
         if (handler)
@@ -76,22 +78,22 @@ class Route {
             else if (t instanceof HTMLElement)
                 t.removeEventListener('click', f);
 
-            else if (t.dispatchRoute)
-                this.eventManager.removeEventListener(Event.ROUTE_CHANGE, f);
+            else if (t instanceof EventManager)
+                this.eventManager.removeListener(Event.ROUTE_CHANGE, f);
 
             this.subscriptions.splice(i, 1);
         }
     }
     assign(path) {
         history.pushState({}, '', path);
-        this.dispatchRoute();
+        this.dispatch();
     }
     replace(path) {
         history.replaceState({}, '', path);
-        this.dispatchRoute();
+        this.dispatch();
     }
     reload() {
-        this.dispatchRoute();
+        this.dispatch();
     }
     toString() {
         return getFullPath();
