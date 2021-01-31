@@ -2,13 +2,15 @@
 
 *A lightweight browser history router*
 
-The `route` singleton object exposes a `window.location`-like API to browser history navigation. The API of the `Router` class also inherits from a native JS Event API and offers customization of the route pattern matching.
+The two essential parts of this package are
+- the `route` singleton object that exposes a `window.location`-like API to browser history navigation, and
+- the `Router` class whose instances will assign handlers to specific path locations.
 
 ## Exports
 
 ### `class Router`
 
-An instance of the `Router` class is a browser history router, an object that helps control how the URL history is handled.
+An instance of the `Router` class is a browser history router, an object that helps control how the URL history is handled. Internally, the `Router` class is an extension of the [`EventManager`](https://github.com/axtk/event-manager) class.
 
 ```js
 const router = new Router({baseRoute: '/section'});
@@ -18,7 +20,7 @@ router.addListener(/^\/\d+$/, ({path, params}) => {
 });
 ```
 
-By default, routes are matched via regular expressions. A router can be configured to enable capturing named route parameters by overriding its methods:
+By default, routes are matched via regular expressions. A router can be configured to enable capturing named route parameters by overriding a couple of its helper methods:
 
 ```js
 import Router from 'router';
