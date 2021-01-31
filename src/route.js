@@ -15,8 +15,8 @@ class Route {
         this.eventManager.dispatch(Event.ROUTE_CHANGE, {path});
     }
     onChange(handler) {
-        if (typeof handler !== 'function') return;
-        return this.eventManager.addListener(Event.ROUTE_CHANGE, handler).remove;
+        let listener = this.eventManager.addListener(Event.ROUTE_CHANGE, handler);
+        if (listener) return listener.remove;
     }
     subscribe(target) {
         let handler;

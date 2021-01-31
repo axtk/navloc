@@ -33,16 +33,17 @@ class PatternRouter extends Router {
     }
     toHandlerPayload(listener, event) {
         return {
-            path: event.type,
-            params: new Route(listener.type).match(event.type)
+            params: new Route(listener.type).match(event.type),
+            route: event.type,
+            path: event.path
         };
     }
 }
 
 const router = new PatternRouter({baseRoute: '/section'});
 
-router.addListener('/:sectionId', ({path, params}) => {
-    console.log(path, params);
+router.addListener('/:sectionId', ({params, route, path}) => {
+    console.log(params, route, path);
 });
 ```
 
@@ -50,17 +51,17 @@ router.addListener('/:sectionId', ({path, params}) => {
   - **`props?: object`**
   - **`props.baseRoute?: string`**
     - A base route, a prefix for all paths handled on this router.
-    - Default: `''`.
+    - Default: `undefined` (same as `'/'`).
 - **`.addListener(routePattern, handler)`**
-  - **`routePattern: any`**
-  - **`handler: function | function[]`**
+  - **`routePattern: string | string[] | RegExp | RegExp[]`**
+  - **`handler: function`**
   - Returns: **`listener: object | object[]`**
   - Adds a `handler` (or multiple handlers) to the specified `routePattern`. In the default setting, a route pattern is a `string` or a regular expression. (This can be changed with a custom `shouldCallListener` method in descendant classes.) If a handler is not a function, it is silently ignored.
-  - This method returns a listener object (or an array thereof) with a `remove()` method that removes the listener from the router.
+  - This method returns a listener object with a `remove()` method that removes the listener from the router. It returns an array of listeners for an array of route patterns.
 - **`.removeListener(routePattern, handler?)`**
-  - **`routePattern: any`**
-  - **`handler?: function | function[]`**
-  - Removes a route listener of the specified `routePattern` and route `handler` (or an array of handlers). If the handler is not specified, all subscriptions to the specified `routePattern` are removed.
+  - **`routePattern: string | string[] | RegExp | RegExp[]`**
+  - **`handler?: function`**
+  - Removes a route listener of the specified `routePattern` and route `handler`. If the handler is not specified, all subscriptions to the specified `routePattern` are removed.
 - **`.dispatch(path)`**
   - **`path: string`**
   - Notifies the router of the specified `path`.
