@@ -44,8 +44,10 @@ class PatternRouter extends Router {
         };
     }
 }
+```
 
-const router = new PatternRouter({baseRoute: '/section'});
+```js
+let router = new PatternRouter({baseRoute: '/section'});
 
 router.addListener('/:sectionId', ({params, route, path}) => {
     console.log(params, route, path);
