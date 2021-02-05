@@ -1,5 +1,6 @@
 import EventManager from 'event-manager';
 import getFullPath from '../lib/getFullPath';
+import getRoute from '../lib/getRoute';
 import isNavigable from '../lib/isNavigable';
 import isCollection from '../lib/isCollection';
 import Event from '../lib/Event';
@@ -22,6 +23,15 @@ class Route {
     onChange(handler) {
         let listener = this.eventManager.addListener(Event.ROUTE_CHANGE, handler);
         if (listener) return listener.remove;
+    }
+    /**
+     * Checks whether the specified route matches the current path.
+     * @param {string} route
+     * @param {boolean} [exact]
+     * @returns {boolean}
+     */
+    matches(route, exact) {
+        return exact ? getFullPath() === route : getRoute(getFullPath(), route) != null;
     }
     /**
      * Primarily, subscribes links to route changes in order to enable history navigation
