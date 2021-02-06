@@ -26,11 +26,14 @@ class Route {
     }
     /**
      * Checks whether the current path matches the specified route path or route pattern.
-     * @param {string | RegExp} routePath
+     * @param {string | RegExp | (string | RegExp)[]} routePath
      * @param {boolean} [exact]
      * @returns {boolean}
      */
     matches(routePath, exact) {
+        if (Array.isArray(routePath))
+            return routePath.some(r => this.matches(r, exact));
+
         let currentPath = getFullPath();
 
         if (exact)

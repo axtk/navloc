@@ -1,7 +1,7 @@
 import route from './route';
 
 /**
- * @param {string | RegExp} routePath
+ * @param {string | RegExp | (string | RegExp)[]} routePath
  * @param {*} x
  * @param {*} y
  * @returns {*}
