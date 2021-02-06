@@ -3,6 +3,7 @@ import route from './route';
 /**
  * @param {string | RegExp} routePath
  * @param {*} x
+ * @param {*} y
  * @returns {*}
  */
-export default (routePath, x) => route.matches(routePath) ? x : null;
+export default (routePath, x, y) => route.matches(routePath) ? x : y;
