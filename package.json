@@ -4,6 +4,7 @@
   "description": "A lightweight browser history router",
   "main": "index.js",
   "scripts": {
+    "build": "npx esbuild index.js --bundle --outfile=index.build.js --global-name=router",
     "test": "node -r esm test.js"
   },
   "keywords": [
@@ -16,6 +17,7 @@
     "event-manager": "github:axtk/event-manager"
   },
   "devDependencies": {
+    "esbuild": "^0.8.42",
     "esm": "^3.2.25"
   }
 }
