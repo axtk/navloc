@@ -25,13 +25,21 @@ class Route {
         return () => listener.remove();
     }
     /**
-     * Checks whether the specified route matches the current path.
-     * @param {string} route
+     * Checks whether the current path matches the specified route path or route pattern.
+     * @param {string | RegExp} routePath
      * @param {boolean} [exact]
      * @returns {boolean}
      */
-    matches(route, exact) {
-        return exact ? getFullPath() === route : getRoute(getFullPath(), route) != null;
+    matches(routePath, exact) {
+        let currentPath = getFullPath();
+
+        if (exact)
+            return currentPath === routePath;
+
+        if (routePath instanceof RegExp)
+            return routePath.test(currentPath);
+
+        return getRoute(currentPath, routePath) != null;
     }
     /**
      * Subscribes (mostly) links to route changes in order to enable history navigation
