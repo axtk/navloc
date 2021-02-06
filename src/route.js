@@ -49,6 +49,7 @@ class Route {
      * or an EventManager instance.
      *
      * @param {string | string[] | HTMLElement | HTMLElement[] | HTMLCollection | NodeList | EventManager} target
+     * @returns {function} - A function that removes the subscription.
      *
      * @example
      * ```js
@@ -59,12 +60,10 @@ class Route {
     subscribe(target) {
         let handler;
 
-        if (!target)
-            return;
-
         // array-like collection
-        else if (isCollection(target)) {
-            for (let t of target) this.subscribe(t);
+        if (isCollection(target)) {
+            let unsubscribe = Array.from(target).map(t => this.subscribe(t));
+            return () => unsubscribe.forEach(f => f());
         }
 
         // selector
@@ -92,35 +91,31 @@ class Route {
                 target.dispatch(event.path);
             });
 
-        if (handler)
-            this.subscriptions.push({target, handler});
-    }
-    unsubscribe(target) {
-        if (!target)
-            return;
+        if (!handler)
+            return () => {};
 
-        if (isCollection(target)) {
-            for (let t of target) this.unsubscribe(t);
-            return;
-        }
+        let id = Math.random().toString(36).slice(2);
+        this.subscriptions.push({target, handler, id});
 
-        for (let i = this.subscriptions.length - 1; i >= 0; i--) {
-            let {target: t, handler: f} = this.subscriptions[i];
+        return () => {
+            for (let i = this.subscriptions.length - 1; i >= 0; i--) {
+                if (this.subscriptions[i].id !== id)
+                    continue;
 
-            if (t !== target)
-                continue;
+                let {target: t, handler: f} = this.subscriptions[i];
 
-            if (typeof t === 'string')
-                document.removeEventListener('click', f);
+                if (typeof t === 'string')
+                    document.removeEventListener('click', f);
 
-            else if (t instanceof HTMLElement)
-                t.removeEventListener('click', f);
+                else if (t instanceof HTMLElement)
+                    t.removeEventListener('click', f);
 
-            else if (t instanceof EventManager)
-                this.eventManager.removeListener(Event.ROUTE_CHANGE, f);
+                else if (t instanceof EventManager)
+                    this.eventManager.removeListener(Event.ROUTE_CHANGE, f);
 
-            this.subscriptions.splice(i, 1);
-        }
+                this.subscriptions.slice(i, 1);
+            }
+        };
     }
     /**
      * Causes the navigation to the specified path and saves it to the browser history.
