@@ -1,19 +1,25 @@
 import EventManager from 'event-manager';
 import getFullPath from '../lib/getFullPath';
-import getRoute from '../lib/getRoute';
 import isNavigable from '../lib/isNavigable';
-import isCollection from '../lib/isCollection';
-import Event from '../lib/Event';
 
-class Route {
+class Route extends EventManager {
     constructor() {
-        this.eventManager = new EventManager();
+        super();
         this.subscriptions = [];
 
         window.addEventListener('popstate', () => this.dispatch());
     }
-    dispatch(path = getFullPath()) {
-        this.eventManager.dispatch(Event.ROUTE_CHANGE, {path});
+    /**
+     * @param {string | string[] | RegExp | RegExp[]} routePattern
+     * @param {function} handler
+     * @returns {object} - A listener object with a `remove()` method that removes the subscription.
+     */
+    addListener(routePattern, handler) {
+        if (Array.isArray(routePattern)) {
+            let listeners = routePattern.map(r => super.addListener(r, handler));
+            return {remove: () => listeners.forEach(listener => listener.remove())};
+        }
+        return super.addListener(routePattern, handler);
     }
     /**
      * Subscribes the handler to all route changes.
@@ -21,37 +27,33 @@ class Route {
      * @returns {function} - A function that removes the subscription.
      */
     onChange(handler) {
-        let listener = this.eventManager.addListener(Event.ROUTE_CHANGE, handler);
+        let listener = super.addListener('*', handler);
         return () => listener.remove();
     }
     /**
-     * Checks whether the current path matches the specified route path or route pattern.
-     * @param {string | RegExp | (string | RegExp)[]} routePath
-     * @param {boolean} [exact]
+     * Checks whether the current path matches the specified route path(s) or route pattern(s).
+     * @param {string | RegExp | string[] | RegExp[]} routePattern
      * @returns {boolean}
      */
-    matches(routePath, exact) {
-        if (Array.isArray(routePath))
-            return routePath.some(r => this.matches(r, exact));
-
-        let currentPath = getFullPath();
-
-        if (exact)
-            return currentPath === routePath;
-
-        if (routePath instanceof RegExp)
-            return routePath.test(currentPath);
-
-        return getRoute(currentPath, routePath) != null;
+    matches(routePattern) {
+        if (Array.isArray(routePattern))
+            return routePattern.some(r => this.matches(r));
+        return this.shouldCallListener({type: routePattern}, {type: getFullPath()});
+    }
+    toHandlerPayload(listener, event) {
+        let {type, ...props} = super.toHandlerPayload(listener, event);
+        return {...props, path: type};
+    }
+    dispatch(path = getFullPath()) {
+        super.dispatch(path);
     }
     /**
-     * Subscribes (mostly) links to route changes in order to enable history navigation
+     * Subscribes HTML links to route changes in order to enable history navigation
      * without page reloading.
      *
-     * The target can be a selector, or an HTML element, or a collection of HTML elements,
-     * or an EventManager instance.
+     * The target can be a selector, or an HTML element, or a collection of HTML elements.
      *
-     * @param {string | string[] | HTMLElement | HTMLElement[] | HTMLCollection | NodeList | EventManager} target
+     * @param {string | string[] | HTMLElement | HTMLElement[] | HTMLCollection | NodeList} target
      * @returns {function} - A function that removes the subscription.
      *
      * @example
@@ -63,14 +65,8 @@ class Route {
     subscribe(target) {
         let handler;
 
-        // array-like collection
-        if (isCollection(target)) {
-            let unsubscribe = Array.from(target).map(t => this.subscribe(t));
-            return () => unsubscribe.forEach(f => f());
-        }
-
         // selector
-        else if (typeof target === 'string')
+        if (typeof target === 'string')
             document.addEventListener('click', handler = event => {
                 for (let t = event.target; t; t = t.parentNode) {
                     if (t.matches && t.matches(target) && isNavigable(t)) {
@@ -88,11 +84,10 @@ class Route {
                 }
             });
 
-        // routers and other event managers
-        else if (target instanceof EventManager)
-            this.eventManager.addListener(Event.ROUTE_CHANGE, handler = event => {
-                target.dispatch(event.path);
-            });
+        else if (Array.isArray(target) || target instanceof NodeList || target instanceof HTMLCollection) {
+            let unsubscribe = Array.from(target).map(t => this.subscribe(t));
+            return () => unsubscribe.forEach(f => f());
+        }
 
         if (!handler)
             return () => {};
@@ -105,16 +100,13 @@ class Route {
                 if (this.subscriptions[i].id !== id)
                     continue;
 
-                let {target: t, handler: f} = this.subscriptions[i];
+                let {target, handler} = this.subscriptions[i];
 
-                if (typeof t === 'string')
-                    document.removeEventListener('click', f);
+                if (typeof target === 'string')
+                    document.removeEventListener('click', handler);
 
-                else if (t instanceof HTMLElement)
-                    t.removeEventListener('click', f);
-
-                else if (t instanceof EventManager)
-                    this.eventManager.removeListener(Event.ROUTE_CHANGE, f);
+                else if (target instanceof HTMLElement)
+                    target.removeEventListener('click', handler);
 
                 this.subscriptions.slice(i, 1);
             }
