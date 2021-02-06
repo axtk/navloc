@@ -145,13 +145,6 @@ class Route {
     reload() {
         this.dispatch();
     }
-    /**
-     * Returns the current full path.
-     * @see location.toString()
-     */
-    toString() {
-        return getFullPath();
-    }
     go(delta) {
         history.go(delta);
     }
@@ -160,6 +153,25 @@ class Route {
     }
     forward() {
         history.go(1);
+    }
+    /**
+     * Returns the current full path.
+     * @see location.toString()
+     */
+    toString() {
+        return getFullPath();
+    }
+    get href() {
+        return getFullPath();
+    }
+    get pathname() {
+        return window.location.pathname;
+    }
+    get search() {
+        return window.location.search;
+    }
+    get hash() {
+        return window.location.hash;
     }
 }
 
