@@ -22,7 +22,7 @@ class Route {
      */
     onChange(handler) {
         let listener = this.eventManager.addListener(Event.ROUTE_CHANGE, handler);
-        if (listener) return listener.remove;
+        return () => listener.remove();
     }
     /**
      * Checks whether the specified route matches the current path.
@@ -34,7 +34,7 @@ class Route {
         return exact ? getFullPath() === route : getRoute(getFullPath(), route) != null;
     }
     /**
-     * Primarily, subscribes links to route changes in order to enable history navigation
+     * Subscribes (mostly) links to route changes in order to enable history navigation
      * without page reloading.
      *
      * The target can be a selector, or an HTML element, or a collection of HTML elements,
