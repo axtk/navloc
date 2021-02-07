@@ -34,3 +34,7 @@ route.subscribe('a');
 ```
 npm i github:axtk/router
 ```
+
+## Also
+
+- *[react-router](https://github.com/axtk/react-router)*, an extension of *router* with React hooks
