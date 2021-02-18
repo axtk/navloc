@@ -18,6 +18,7 @@ export default new Route();
 ```
 
 ```js
+// index.js
 import {route} from './route';
 
 // adding a handler to an exact URL path

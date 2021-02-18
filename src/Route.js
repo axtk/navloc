@@ -3,10 +3,10 @@ import getPath from '../lib/getPath';
 import isNavigable from '../lib/isNavigable';
 
 class Route extends EventManager {
-    constructor() {
+    constructor(path) {
         super();
 
-        this.href = getPath();
+        this.dispatch(path); // sets this.href
         this.subscriptions = [];
 
         if (typeof window !== 'undefined')
