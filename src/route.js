@@ -1,13 +1,16 @@
 import EventManager from 'event-manager';
-import getFullPath from '../lib/getFullPath';
+import getPath from '../lib/getPath';
 import isNavigable from '../lib/isNavigable';
 
 class Route extends EventManager {
     constructor() {
         super();
+
+        this.href = getPath();
         this.subscriptions = [];
 
-        window.addEventListener('popstate', () => this.dispatch());
+        if (typeof window !== 'undefined')
+            window.addEventListener('popstate', () => this.dispatch());
     }
     /**
      * @param {string | string[] | RegExp | RegExp[]} routePattern
@@ -38,14 +41,15 @@ class Route extends EventManager {
     matches(routePattern) {
         if (Array.isArray(routePattern))
             return routePattern.some(r => this.matches(r));
-        return this.shouldCallListener({type: routePattern}, {type: getFullPath()});
+        return this.shouldCallListener({type: routePattern}, {type: this.href});
     }
     toHandlerPayload(listener, event) {
         let {type, ...props} = super.toHandlerPayload(listener, event);
         return {...props, path: type};
     }
-    dispatch(path = getFullPath()) {
-        super.dispatch(path);
+    dispatch(path) {
+        this.href = path === undefined ? getPath() : path;
+        super.dispatch(this.href);
     }
     /**
      * Subscribes HTML links to route changes in order to enable history navigation
@@ -63,6 +67,9 @@ class Route extends EventManager {
      * ```
      */
     subscribe(target) {
+        if (typeof window === 'undefined')
+            return () => {};
+
         let handler;
 
         // selector
@@ -71,7 +78,7 @@ class Route extends EventManager {
                 for (let t = event.target; t; t = t.parentNode) {
                     if (t.matches && t.matches(target) && isNavigable(t)) {
                         event.preventDefault();
-                        this.assign(getFullPath(t));
+                        this.assign(getPath(t.href));
                     }
                 }
             });
@@ -80,7 +87,7 @@ class Route extends EventManager {
             target.addEventListener('click', handler = event => {
                 if (isNavigable(target)) {
                     event.preventDefault();
-                    this.assign(getFullPath(target));
+                    this.assign(getPath(target.href));
                 }
             });
 
@@ -118,8 +125,10 @@ class Route extends EventManager {
      * @see location.assign()
      */
     assign(path) {
-        history.pushState({}, '', path);
-        this.dispatch();
+        if (typeof history !== 'undefined') {
+            history.pushState({}, '', path);
+            this.dispatch();
+        }
     }
     /**
      * Causes the navigation to the specified path without saving it to the browser history.
@@ -127,8 +136,10 @@ class Route extends EventManager {
      * @see location.replace()
      */
     replace(path) {
-        history.replaceState({}, '', path);
-        this.dispatch();
+        if (typeof history !== 'undefined') {
+            history.replaceState({}, '', path);
+            this.dispatch();
+        }
     }
     /**
      * Re-sends the current path to subscribers (which includes existing Routers).
@@ -138,32 +149,26 @@ class Route extends EventManager {
         this.dispatch();
     }
     go(delta) {
-        history.go(delta);
+        if (typeof history !== 'undefined') {
+            history.go(delta);
+            this.dispatch();
+        }
     }
     back() {
-        history.go(-1);
+        this.go(-1);
     }
     forward() {
-        history.go(1);
+        this.go(1);
+    }
+    getPath() {
+        return this.href;
     }
     /**
      * Returns the current full path.
      * @see location.toString()
      */
     toString() {
-        return getFullPath();
-    }
-    get href() {
-        return getFullPath();
-    }
-    get pathname() {
-        return window.location.pathname;
-    }
-    get search() {
-        return window.location.search;
-    }
-    get hash() {
-        return window.location.hash;
+        return this.href;
     }
 }
 
