@@ -2,14 +2,23 @@
 
 *A lightweight browser history router*
 
-The `route` singleton object:
+An instance of the `Route` class:
+
 - exposes a `window.location`-like API to browser history navigation,
 - allows to subscribe to changes in the URL.
+
+An application will typically have a single instance of this class.
 
 ## Usage
 
 ```js
-import {route} from 'router';
+// route.js
+import {Route} from 'router';
+export default new Route();
+```
+
+```js
+import {route} from './route';
 
 // adding a handler to an exact URL path
 route.addListener('/home', ({path}) => {

@@ -172,4 +172,4 @@ class Route extends EventManager {
     }
 }
 
-export default new Route();
+export default Route;
