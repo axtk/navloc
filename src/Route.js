@@ -3,8 +3,16 @@ import getPath from '../lib/getPath';
 import isNavigable from '../lib/isNavigable';
 
 class Route extends EventManager {
-    constructor(path) {
+    // pathProps: {pathname: boolean, search: boolean, hash: boolean}
+    constructor(path, pathProps) {
         super();
+
+        this.pathProps = {
+            pathname: true,
+            search: false,
+            hash: false,
+            ...pathProps,
+        };
 
         this.dispatch(path); // sets this.href
         this.subscriptions = [];
@@ -48,7 +56,7 @@ class Route extends EventManager {
         return {...props, path: type};
     }
     dispatch(path) {
-        this.href = path === undefined ? getPath() : path;
+        this.href = getPath(path, this.pathProps);
         super.dispatch(this.href);
     }
     /**
