@@ -3,7 +3,13 @@ import getPath from '../lib/getPath';
 import isNavigable from '../lib/isNavigable';
 
 class Route extends EventManager {
-    // pathProps: {pathname: boolean, search: boolean, hash: boolean}
+    /**
+     * @param {string | null} [path] - Initial path. Default: from the global context.
+     * @param {object} [pathProps] - Which path components should be taken into account.
+     * @param {boolean} [pathProps.pathname=true]
+     * @param {boolean} [pathProps.search=false]
+     * @param {boolean} [pathProps.hash=false]
+     */
     constructor(path, pathProps) {
         super();
 
