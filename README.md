@@ -14,7 +14,7 @@ An application will typically have a single instance of this class.
 ```js
 // route.js
 import {Route} from 'router';
-export default new Route();
+export const route = new Route();
 ```
 
 ```js
