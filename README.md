@@ -1,50 +1,46 @@
-# router
+[![npm](https://img.shields.io/npm/v/@axtk/router?labelColor=royalblue&color=royalblue&style=flat-square)](https://www.npmjs.com/package/@axtk/router)
+![browser](https://img.shields.io/badge/browser-✓-blue?labelColor=dodgerblue&color=dodgerblue&style=flat-square)
 
 *A lightweight browser history router*
 
-An instance of the `Route` class:
+An instance of the `Router` class is a browser history router, an object that helps control how changes in the URL are handled. An application will typically have a single instance of this class (which is similar to the `window.location` singleton).
 
-- exposes a `window.location`-like API to browser history navigation,
-- allows to subscribe to changes in the URL.
+# Usage
 
-An application will typically have a single instance of this class.
-
-## Usage
+Initialization:
 
 ```js
 // route.js
-import {Route} from 'router';
+import {Route} from '@axtk/router';
 export const route = new Route();
 ```
 
+Adding a handler of an exact URL path:
+
 ```js
-// index.js
 import {route} from './route';
 
-// adding a handler to an exact URL path
 route.addListener('/home', ({path}) => {
     console.log(path);
 });
+```
 
-// adding a handler to a specific URL path pattern
+Of a specific URL path pattern:
+
+```js
 route.addListener(/^\/section\/(?<id>\d+)\/?$/, ({path, params}) => {
     console.log(path, params.id);
 });
+```
 
-// enabling history navigation on existing and future links
+Enabling history navigation on existing and future links:
+
+```js
 route.subscribe('a');
 ```
 
-## API
+*See also the [source code JSDoc](https://github.com/axtk/router/tree/master/src).*
 
-*See JSDoc in [`./src`](/src).*
-
-## Installation
-
-```
-npm i github:axtk/router
-```
-
-## Also
+# Also
 
 - *[react-router](https://github.com/axtk/react-router)*, an extension of *router* with React hooks

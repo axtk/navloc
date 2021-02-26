@@ -1,4 +1,4 @@
-import EventManager from 'event-manager';
+import EventManager from '@axtk/event-manager';
 import getPath from '../lib/getPath';
 import isNavigable from '../lib/isNavigable';
 
