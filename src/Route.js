@@ -57,10 +57,44 @@ class Route extends EventManager {
             return routePattern.some(r => this.matches(r));
         return this.shouldCallListener({type: routePattern}, {type: this.href});
     }
+    /**
+     * Returns the second argument if the current path matches the specified route path(s)
+     * or route pattern(s), and the third argument otherwise.
+     *
+     * If the second or the third argument is a function, it is invoked with a
+     * `{path, params}` object as an argument.
+     *
+     * @param {string | RegExp | string[] | RegExp[]} routePattern
+     * @param {*} [matchOutput=true]
+     * @param {*} [unmatchOutput=false]
+     * @returns {*}
+     */
+    match(routePattern, matchOutput = true, unmatchOutput = false) {
+        let matched = false, matchEvent = {type: this.href}, payload;
+
+        if (Array.isArray(routePattern)) {
+            for (let i = 0; i < routePattern.length && !matched; i++) {
+                if ((matched |= this.matches(routePattern[i])))
+                    payload = this.toHandlerPayload({type: routePattern[i]}, matchEvent);
+            }
+        }
+        else {
+            matched = this.matches(routePattern);
+            payload = this.toHandlerPayload({type: routePattern}, matchEvent);
+        }
+
+        return matched ?
+            (typeof matchOutput === 'function' ? matchOutput(payload) : matchOutput) :
+            (typeof unmatchOutput === 'function' ? unmatchOutput(payload) : unmatchOutput);
+    }
     toHandlerPayload(listener, event) {
         let {type, ...props} = super.toHandlerPayload(listener, event);
         return {...props, path: type};
     }
+    /**
+     * Dispatches a path event.
+     * @param {string} [path] - Default: the current path.
+     */
     dispatch(path) {
         this.href = getPath(path, this.pathProps);
         super.dispatch(this.href);
@@ -86,7 +120,7 @@ class Route extends EventManager {
 
         let handler;
 
-        // selector
+        // `target` is a selector
         if (typeof target === 'string')
             document.addEventListener('click', handler = event => {
                 for (let t = event.target; t; t = t.parentNode) {
@@ -134,9 +168,9 @@ class Route extends EventManager {
         };
     }
     /**
-     * Causes the navigation to the specified path and saves it to the browser history.
-     * @see history.pushState()
-     * @see location.assign()
+     * Adds an entry to the browser's session history
+     * (see [`history.pushState()`](https://developer.mozilla.org/en-US/docs/Web/API/History/pushState)
+     * and dispatches a new path event.
      */
     assign(path) {
         if (typeof history !== 'undefined') {
@@ -145,9 +179,9 @@ class Route extends EventManager {
         }
     }
     /**
-     * Causes the navigation to the specified path without saving it to the browser history.
-     * @see history.replaceState()
-     * @see location.replace()
+     * Replaces the current history entry
+     * (see [`history.replaceState()`](https://developer.mozilla.org/en-US/docs/Web/API/History/replaceState)
+     * and dispatches a new path event.
      */
     replace(path) {
         if (typeof history !== 'undefined') {
@@ -156,12 +190,17 @@ class Route extends EventManager {
         }
     }
     /**
-     * Re-sends the current path to subscribers (which includes existing Routers).
-     * @see location.reload()
+     * Re-dispatches the current path event.
      */
     reload() {
         this.dispatch();
     }
+    /*
+     * Loads a specific page from the session history
+     * (see [`history.go(delta)`](https://developer.mozilla.org/en-US/docs/Web/API/History/go)
+     * and dispatches a new path event.
+     * @param {number} delta - A number of history entries to jump away from the current entry.
+     */
     go(delta) {
         if (typeof history !== 'undefined') {
             history.go(delta);
@@ -174,12 +213,8 @@ class Route extends EventManager {
     forward() {
         this.go(1);
     }
-    getPath() {
-        return this.href;
-    }
     /**
-     * Returns the current full path.
-     * @see location.toString()
+     * Returns the current full path, same as `.href`.
      */
     toString() {
         return this.href;
