@@ -106,6 +106,7 @@ class Route extends EventManager {
      * The target can be a selector, or an HTML element, or a collection of HTML elements.
      *
      * @param {string | string[] | HTMLElement | HTMLElement[] | HTMLCollection | NodeList} target
+     * @param {string} [eventType='click'] - A DOM event type to listen to.
      * @returns {function} - A function that removes the subscription.
      *
      * @example
@@ -114,7 +115,7 @@ class Route extends EventManager {
      * route.subscribe('a');
      * ```
      */
-    subscribe(target) {
+    subscribe(target, eventType = 'click') {
         if (typeof window === 'undefined')
             return () => {};
 
@@ -122,7 +123,7 @@ class Route extends EventManager {
 
         // `target` is a selector
         if (typeof target === 'string')
-            document.addEventListener('click', handler = event => {
+            document.addEventListener(eventType, handler = event => {
                 for (let t = event.target; t; t = t.parentNode) {
                     if (t.matches && t.matches(target) && isNavigable(t)) {
                         event.preventDefault();
@@ -132,7 +133,7 @@ class Route extends EventManager {
             });
 
         else if (target instanceof HTMLElement)
-            target.addEventListener('click', handler = event => {
+            target.addEventListener(eventType, handler = event => {
                 if (isNavigable(target)) {
                     event.preventDefault();
                     this.assign(getPath(target.href));
@@ -148,20 +149,20 @@ class Route extends EventManager {
             return () => {};
 
         let id = Math.random().toString(36).slice(2);
-        this.subscriptions.push({target, handler, id});
+        this.subscriptions.push({eventType, target, handler, id});
 
         return () => {
             for (let i = this.subscriptions.length - 1; i >= 0; i--) {
                 if (this.subscriptions[i].id !== id)
                     continue;
 
-                let {target, handler} = this.subscriptions[i];
+                let {eventType, target, handler} = this.subscriptions[i];
 
                 if (typeof target === 'string')
-                    document.removeEventListener('click', handler);
+                    document.removeEventListener(eventType, handler);
 
                 else if (target instanceof HTMLElement)
-                    target.removeEventListener('click', handler);
+                    target.removeEventListener(eventType, handler);
 
                 this.subscriptions.slice(i, 1);
             }
