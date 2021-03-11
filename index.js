@@ -197,9 +197,9 @@ class Route extends EventManager {
         this.dispatch();
     }
     /*
-     * Loads a specific page from the session history
+     * Loads a specific page from the browser history
      * (see [`history.go(delta)`](https://developer.mozilla.org/en-US/docs/Web/API/History/go)
-     * and dispatches a new path event (within a `popstate` handler).
+     * and dispatches a new path event (within the `popstate` handler).
      * @param {number} delta - A number of history entries to jump away from the current entry.
      */
     go(delta) {
