@@ -141,7 +141,7 @@ class Route extends EventManager {
             });
 
         else if (Array.isArray(target) || target instanceof NodeList || target instanceof HTMLCollection) {
-            let unsubscribe = Array.from(target).map(t => this.subscribe(t));
+            let unsubscribe = Array.from(target).map(t => this.subscribe(t, eventType));
             return () => unsubscribe.forEach(f => f());
         }
 
