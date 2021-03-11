@@ -11,7 +11,7 @@ Initialization:
 
 ```js
 // route.js
-import {Route} from '@axtk/router';
+import Route from '@axtk/router';
 export const route = new Route();
 ```
 
@@ -25,7 +25,7 @@ route.addListener('/home', ({path}) => {
 });
 ```
 
-Of a specific URL path pattern:
+and of a specific URL path pattern:
 
 ```js
 route.addListener(/^\/section\/(?<id>\d+)\/?$/, ({path, params}) => {
@@ -33,14 +33,75 @@ route.addListener(/^\/section\/(?<id>\d+)\/?$/, ({path, params}) => {
 });
 ```
 
+Tracking all changes:
+
+```js
+route.onChange(({path}) => {
+    console.log(path);
+});
+```
+
+Retrieving the current location:
+
+```js
+console.log(route.href);
+```
+
 Enabling history navigation on existing and future links:
 
 ```js
-route.subscribe('a');
+route.subscribe('.app a');
 ```
 
-*See also the [source code JSDoc](https://github.com/axtk/router/tree/master/src).*
+Checking a route pattern (or an array thereof) if it matches the current path:
+
+```js
+// Provided that the current location is '/section/42':
+route.matches('/home'); // false
+route.matches(/^\/section\/(?<id>\d+)\/?$/); // true
+route.matches(['/home', /^\/section\/(?<id>\d+)\/?$/]); // true
+```
+
+and resolving to the specified value:
+
+```js
+// Provided that the current location is '/section/42':
+route.match(/^\/section\/(?<id>\d+)\/?$/, 1, -1); // 1
+route.match(
+    /^\/section\/(?<id>\d+)\/?$/,
+    ({path, params}) => Number(params.id), // if matched
+    -1 // if unmatched
+); // 42
+```
+
+Changing the current location to another path:
+
+```js
+// With the current location saved in the browser history
+route.assign('/home');
+```
+
+```js
+// Without saving the current location in the browser history
+route.replace('/home');
+```
+
+Reloading the current location (by re-dispatching the current path event to the subscribers of `route`):
+
+```js
+route.reload();
+```
+
+Jumping to browser history entries:
+
+```js
+route.go(-2); // to go 2 entries back in the browser history
+route.back(); // = route.go(-1);
+route.forward(); // = route.go(+1);
+```
+
+*See the [source code JSDoc](https://github.com/axtk/router/tree/master/src) for more specific details on the method signatures.*
 
 # Also
 
-- *[react-router](https://github.com/axtk/react-router)*, an extension of *router* with React hooks
+- *[@axtk/react-router](https://github.com/axtk/react-router)*, an extension of *router* with React hooks
