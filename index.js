@@ -176,7 +176,7 @@ class Route extends EventManager {
     assign(path) {
         if (typeof history !== 'undefined') {
             history.pushState({}, '', path);
-            this.dispatch();
+            this.dispatch(path);
         }
     }
     /**
@@ -187,7 +187,7 @@ class Route extends EventManager {
     replace(path) {
         if (typeof history !== 'undefined') {
             history.replaceState({}, '', path);
-            this.dispatch();
+            this.dispatch(path);
         }
     }
     /**
@@ -199,14 +199,12 @@ class Route extends EventManager {
     /*
      * Loads a specific page from the session history
      * (see [`history.go(delta)`](https://developer.mozilla.org/en-US/docs/Web/API/History/go)
-     * and dispatches a new path event.
+     * and dispatches a new path event (within a `popstate` handler).
      * @param {number} delta - A number of history entries to jump away from the current entry.
      */
     go(delta) {
-        if (typeof history !== 'undefined') {
+        if (typeof history !== 'undefined')
             history.go(delta);
-            this.dispatch();
-        }
     }
     back() {
         this.go(-1);
