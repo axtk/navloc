@@ -100,7 +100,7 @@ route.back(); // = route.go(-1);
 route.forward(); // = route.go(+1);
 ```
 
-*See the [source code JSDoc](https://github.com/axtk/router/tree/master/src) for more specific details on the method signatures.*
+*See the [source code JSDoc](https://github.com/axtk/router/blob/master/index.js) for more specific details on the method signatures.*
 
 # Also
 
