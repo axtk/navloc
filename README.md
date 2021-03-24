@@ -11,7 +11,7 @@ Initialization:
 
 ```js
 // route.js
-import Route from '@axtk/router';
+import {Route} from '@axtk/router';
 export const route = new Route();
 ```
 
