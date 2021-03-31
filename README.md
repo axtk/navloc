@@ -1,5 +1,6 @@
 [![npm](https://img.shields.io/npm/v/@axtk/router?labelColor=royalblue&color=royalblue&style=flat-square)](https://www.npmjs.com/package/@axtk/router)
 ![browser](https://img.shields.io/badge/browser-✓-blue?labelColor=dodgerblue&color=dodgerblue&style=flat-square)
+![TypeScript](https://img.shields.io/badge/TypeScript-✓-blue?labelColor=dodgerblue&color=dodgerblue&style=flat-square)
 
 *A lightweight browser history router*
 
@@ -57,21 +58,9 @@ Checking a route pattern (or an array thereof) if it matches the current path:
 
 ```js
 // Provided that the current location is '/section/42':
-route.matches('/home'); // false
-route.matches(/^\/section\/(?<id>\d+)\/?$/); // true
-route.matches(['/home', /^\/section\/(?<id>\d+)\/?$/]); // true
-```
-
-and resolving to the specified value:
-
-```js
-// Provided that the current location is '/section/42':
-route.match(/^\/section\/(?<id>\d+)\/?$/, 1, -1); // 1
-route.match(
-    /^\/section\/(?<id>\d+)\/?$/,
-    ({path, params}) => Number(params.id), // if matched
-    -1 // if unmatched
-); // 42
+route.match('/home'); // null
+route.match('/section/42'); // {}
+route.match(/^\/section\/(?<id>\d+)\/?$/); // {0: '42', id: '42'}
 ```
 
 Changing the current location to another path:

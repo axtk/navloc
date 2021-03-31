@@ -1,6 +1,11 @@
+import {PathProps} from './types';
+
 const SYNTHETIC_ORIGIN = 'https://c.cc';
 
-export default (location, pathProps = {}) => {
+export const getPath = (
+    location: string | null | undefined,
+    pathProps: PathProps = {},
+): string | undefined => {
     try {
         return (URL => {
             let url = location == null ?
@@ -15,10 +20,9 @@ export default (location, pathProps = {}) => {
                 (pathProps.hash === false ? '' : url.hash)
             );
         })(
-            typeof URL === 'undefined' && typeof require !== 'undefined' ?
-                // for Node prior to v10.0 without URL in the global scope
-                require('url').URL :
-                URL
+            // for Node prior to v10.0 without URL in the global scope
+            // @ts-ignore: require without type definition
+            typeof URL === 'undefined' && typeof require !== 'undefined' ? require('url').URL : URL
         );
     }
     catch(e) {}

@@ -1,15 +1,12 @@
-export default element => {
+export const isRouteLink = (element) => {
     if (!element)
         return false;
-
-    let {target, href} = element;
-
+    let { target, href } = element;
     if (href == null || (target && target !== '_self'))
         return false;
-
     try {
-        let {origin} = window.location;
+        let { origin } = window.location;
         return new URL(href, origin).origin === origin;
     }
-    catch(e) {}
+    catch (e) { }
 };
