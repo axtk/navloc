@@ -5,8 +5,7 @@ export const isRouteLink = (element) => {
     if (href == null || (target && target !== '_self'))
         return false;
     try {
-        let { origin } = window.location;
-        return new URL(href, origin).origin === origin;
+        return new URL(href, window.location.href).origin === window.location.origin;
     }
     catch (e) { }
 };
