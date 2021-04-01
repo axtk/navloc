@@ -1,6 +1,4 @@
-import type {HTMLLinkLikeElement} from './types';
-
-interface AbstractLink {
+export interface AbstractLink {
     href?: string | null;
     target?: string;
 }
@@ -9,7 +7,7 @@ export const isRouteLink = (element: AbstractLink | Node): boolean => {
     if (!element)
         return false;
 
-    let {target, href} = element as AbstractLink | HTMLLinkLikeElement;
+    let {target, href} = element as AbstractLink | HTMLAnchorElement | HTMLAreaElement;
 
     if (href == null || (target && target !== '_self'))
         return false;

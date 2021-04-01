@@ -8,10 +8,9 @@ import {
     RouteListener,
     RouteSubscription,
     RemoveRouteSubscription,
-    HTMLLinkLikeElement,
 } from './types';
 
-export const DefaultPathProps = {
+export const DefaultPathProps: PathProps = {
     pathname: true,
     search: false,
     hash: false,
@@ -80,7 +79,7 @@ export class Route {
                 let t: Node | null = event.target.closest(target);
                 if (isRouteLink(t)) {
                     event.preventDefault();
-                    this.assign(getPath((t as HTMLLinkLikeElement).href));
+                    this.assign(getPath((t as HTMLAnchorElement | HTMLAreaElement).href));
                 }
             });
 
@@ -88,7 +87,7 @@ export class Route {
             target.addEventListener(eventType, handler = event => {
                 if (isRouteLink(target)) {
                     event.preventDefault();
-                    this.assign(getPath((target as HTMLLinkLikeElement).href));
+                    this.assign(getPath((target as HTMLAnchorElement | HTMLAreaElement).href));
                 }
             });
 
