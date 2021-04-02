@@ -20,7 +20,7 @@
   "author": "axtk",
   "license": "MIT",
   "dependencies": {
-    "@axtk/event-manager": "^1.2.0"
+    "@axtk/event-manager": "^1.2.2"
   },
   "devDependencies": {
     "esbuild": "^0.8.52",
