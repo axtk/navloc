@@ -6,7 +6,6 @@ import {
     RoutePattern,
     RouteHandler,
     RouteListener,
-    RouteSubscription,
     RemoveRouteSubscription,
 } from './types';
 
@@ -19,7 +18,6 @@ export const DefaultPathProps: PathProps = {
 export class Route {
     href: string;
     pathProps: PathProps;
-    subscriptions: RouteSubscription[];
     eventManager: EventManager<RoutePattern, string>;
 
     constructor(initialPath?: string, pathProps?: PathProps) {
@@ -30,7 +28,6 @@ export class Route {
 
         this.eventManager = new EventManager();
         this.dispatch(initialPath); // sets this.href
-        this.subscriptions = [];
 
         if (typeof window !== 'undefined')
             window.addEventListener('popstate', () => this.dispatch());
@@ -75,7 +72,7 @@ export class Route {
         let handler;
 
         // `target` is a selector
-        if (typeof target === 'string')
+        if (typeof target === 'string') {
             scope.addEventListener(eventType, handler = event => {
                 let t: Node | null = event.target.closest(target);
                 if (isRouteLink(t)) {
@@ -84,7 +81,12 @@ export class Route {
                 }
             });
 
-        else if (target instanceof Node)
+            return () => {
+                scope.removeEventListener(eventType, handler);
+            };
+        }
+
+        else if (target instanceof Node) {
             target.addEventListener(eventType, handler = event => {
                 if (isRouteLink(target)) {
                     event.preventDefault();
@@ -92,33 +94,21 @@ export class Route {
                 }
             });
 
-        else if (Array.isArray(target) || target instanceof NodeList || target instanceof HTMLCollection) {
-            let unsubscribe = Array.from(target).map(t => this.subscribe(t, scope, eventType));
-            return () => unsubscribe.forEach(f => f());
+            return () => {
+                target.removeEventListener(eventType, handler);
+            };
         }
 
-        if (!handler)
-            return () => {};
+        else if (Array.isArray(target) || target instanceof NodeList || target instanceof HTMLCollection) {
+            let unsubscriptions = Array.from(target).map(item => this.subscribe(item, scope, eventType));
 
-        let id = Math.random().toString(36).slice(2);
-        this.subscriptions.push({eventType, target, handler, id, scope});
+            return () => {
+                for (let unsubscribe of unsubscriptions)
+                    unsubscribe();
+            };
+        }
 
-        return () => {
-            for (let i = this.subscriptions.length - 1; i >= 0; i--) {
-                if (this.subscriptions[i].id !== id)
-                    continue;
-
-                let {eventType, target, handler, scope} = this.subscriptions[i];
-
-                if (typeof target === 'string')
-                    scope.removeEventListener(eventType, handler);
-
-                else if (target instanceof Node)
-                    target.removeEventListener(eventType, handler);
-
-                this.subscriptions.splice(i, 1);
-            }
-        };
+        return () => {};
     }
     /**
      * Adds an entry to the browser's session history

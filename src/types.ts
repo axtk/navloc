@@ -11,14 +11,6 @@ export type PathProps = {
     hash?: boolean;
 }
 
-export type RouteSubscription = {
-    id: string;
-    eventType: string;
-    target: string | Node;
-    scope: HTMLElement | Document;
-    handler: (e: Event) => void;
-}
-
 export type RemoveRouteSubscription = () => void;
 
 export type AbstractLink = {
