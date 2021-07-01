@@ -66,6 +66,7 @@ export class Route {
      */
     subscribe(
         target: string | Node | Array<string | Node> | HTMLCollection | NodeList,
+        scope: HTMLElement | Document = document,
         eventType: string = 'click',
     ): RemoveRouteSubscription {
         if (typeof window === 'undefined')
@@ -75,7 +76,7 @@ export class Route {
 
         // `target` is a selector
         if (typeof target === 'string')
-            document.addEventListener(eventType, handler = event => {
+            scope.addEventListener(eventType, handler = event => {
                 let t: Node | null = event.target.closest(target);
                 if (isRouteLink(t)) {
                     event.preventDefault();
@@ -92,7 +93,7 @@ export class Route {
             });
 
         else if (Array.isArray(target) || target instanceof NodeList || target instanceof HTMLCollection) {
-            let unsubscribe = Array.from(target).map(t => this.subscribe(t, eventType));
+            let unsubscribe = Array.from(target).map(t => this.subscribe(t, scope, eventType));
             return () => unsubscribe.forEach(f => f());
         }
 
@@ -100,17 +101,17 @@ export class Route {
             return () => {};
 
         let id = Math.random().toString(36).slice(2);
-        this.subscriptions.push({eventType, target, handler, id});
+        this.subscriptions.push({eventType, target, handler, id, scope});
 
         return () => {
             for (let i = this.subscriptions.length - 1; i >= 0; i--) {
                 if (this.subscriptions[i].id !== id)
                     continue;
 
-                let {eventType, target, handler} = this.subscriptions[i];
+                let {eventType, target, handler, scope} = this.subscriptions[i];
 
                 if (typeof target === 'string')
-                    document.removeEventListener(eventType, handler);
+                    scope.removeEventListener(eventType, handler);
 
                 else if (target instanceof Node)
                     target.removeEventListener(eventType, handler);

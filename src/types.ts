@@ -15,6 +15,7 @@ export type RouteSubscription = {
     id: string;
     eventType: string;
     target: string | Node;
+    scope: HTMLElement | Document;
     handler: (e: Event) => void;
 }
 
