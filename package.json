@@ -6,6 +6,7 @@
   "scripts": {
     "build": "esbuild dist/index.js --bundle --outfile=index.build.js --global-name=Router",
     "build:min": "npm run build -- --minify",
+    "test": "node -r esm dist/test.js",
     "tsc": "tsc"
   },
   "keywords": [
@@ -24,6 +25,7 @@
   },
   "devDependencies": {
     "esbuild": "^0.8.52",
+    "esm": "^3.2.25",
     "typescript": "^4.2.3"
   },
   "publishConfig": {

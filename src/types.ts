@@ -5,13 +5,13 @@ export type RouteEvent<P> = Omit<EventManagerEvent<string, P>, 'type' | 'params'
 export type RouteHandler<P> = (payload?: RouteEvent<P>) => void;
 export type RouteListener<P> = Omit<Listener<RoutePattern, P>, 'handler'> & {handler: RouteHandler<P>};
 
-export interface PathProps {
+export type PathProps = {
     pathname?: boolean;
     search?: boolean;
     hash?: boolean;
 }
 
-export interface RouteSubscription {
+export type RouteSubscription = {
     id: string;
     eventType: string;
     target: string | Node;
@@ -19,3 +19,8 @@ export interface RouteSubscription {
 }
 
 export type RemoveRouteSubscription = () => void;
+
+export type AbstractLink = {
+    href?: string | null;
+    target?: string;
+}

@@ -1,5 +1,9 @@
 {
-    "include": ["index.ts"],
+    "include": [
+        "src/**/*.ts",
+        "index.ts",
+        "test.ts"
+    ],
     "compilerOptions": {
         "lib": ["esnext", "dom"],
         "target": "esnext",

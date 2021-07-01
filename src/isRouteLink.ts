@@ -1,7 +1,4 @@
-export interface AbstractLink {
-    href?: string | null;
-    target?: string;
-}
+import type {AbstractLink} from './types';
 
 export const isRouteLink = (element: AbstractLink | Node): boolean => {
     if (!element)
