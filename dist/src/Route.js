@@ -84,7 +84,7 @@ export class Route {
                     document.removeEventListener(eventType, handler);
                 else if (target instanceof Node)
                     target.removeEventListener(eventType, handler);
-                this.subscriptions.slice(i, 1);
+                this.subscriptions.splice(i, 1);
             }
         };
     }
