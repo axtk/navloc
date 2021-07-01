@@ -13,7 +13,7 @@ export type PathProps = {
 
 export type RemoveRouteSubscription = () => void;
 
-export type AbstractLink = {
+export type LinkProps = {
     href?: string | null;
-    target?: string;
+    target?: string | null;
 }

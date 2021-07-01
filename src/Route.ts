@@ -1,6 +1,7 @@
 import {EventManager, matchPattern, Listener, RemoveListener, MatchParams} from '@axtk/event-manager';
 import {getPath} from './getPath';
-import {isRouteLink} from './isRouteLink';
+import {isLinkElement} from './isLinkElement';
+import {hasRouteLinkProps} from './hasRouteLinkProps';
 import {
     PathProps,
     RoutePattern,
@@ -73,11 +74,11 @@ export class Route {
 
         // `target` is a selector
         if (typeof target === 'string') {
-            scope.addEventListener(eventType, handler = event => {
-                let t: Node | null = event.target.closest(target);
-                if (isRouteLink(t)) {
+            scope.addEventListener(eventType, handler = (event: Event) => {
+                let element = event.target instanceof Element ? event.target.closest(target) : null;
+                if (isLinkElement(element) && hasRouteLinkProps(element)) {
                     event.preventDefault();
-                    this.assign(getPath((t as HTMLAnchorElement | HTMLAreaElement).href));
+                    this.assign(getPath(element.href));
                 }
             });
 
@@ -86,11 +87,11 @@ export class Route {
             };
         }
 
-        else if (target instanceof Node) {
-            target.addEventListener(eventType, handler = event => {
-                if (isRouteLink(target)) {
+        else if (isLinkElement(target)) {
+            target.addEventListener(eventType, handler = (event: Event) => {
+                if (hasRouteLinkProps(target)) {
                     event.preventDefault();
-                    this.assign(getPath((target as HTMLAnchorElement | HTMLAreaElement).href));
+                    this.assign(getPath(target.href));
                 }
             });
 
