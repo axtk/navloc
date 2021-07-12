@@ -52,6 +52,9 @@ Enabling history navigation on existing and future links:
 
 ```js
 route.subscribe('.app a');
+
+// Within a scope of a fixed element:
+route.subscribe('.content a', document.querySelector('#main'));
 ```
 
 Checking a route pattern (or an array thereof) if it matches the current path:
