@@ -21,12 +21,12 @@ Adding a handler of an exact URL path:
 ```js
 import {route} from './route';
 
-route.addListener('/home', ({path}) => {
+let routeListener = route.addListener('/home', ({path}) => {
     console.log(path);
 });
 ```
 
-and of a specific URL path pattern:
+of a specific URL path pattern:
 
 ```js
 route.addListener(/^\/section\/(?<id>\d+)\/?$/, ({path, params}) => {
@@ -34,21 +34,39 @@ route.addListener(/^\/section\/(?<id>\d+)\/?$/, ({path, params}) => {
 });
 ```
 
+and removing a previously created route listener:
+
+```js
+routeListener.remove();
+```
+
 Tracking all changes:
 
 ```js
-route.onChange(({path}) => {
+let unsubscribe = route.onChange(({path}) => {
     console.log(path);
 });
+```
+
+and unsubscribing from them:
+
+```js
+unsubscribe();
 ```
 
 Enabling history navigation on existing and future links:
 
 ```js
-route.subscribe('.app a');
+let unsubscribeLinks = route.subscribe('.app a');
 
 // Within a scope of a fixed element:
 route.subscribe('.content a', document.querySelector('#main'));
+```
+
+and canceling it:
+
+```js
+unsubscribeLinks();
 ```
 
 ### Matching
