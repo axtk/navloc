@@ -8,6 +8,9 @@ export const DefaultPathProps = {
     hash: false,
 };
 export class Route {
+    href;
+    pathProps;
+    eventManager;
     constructor(initialPath, pathProps) {
         this.pathProps = {
             ...DefaultPathProps,
