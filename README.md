@@ -4,8 +4,6 @@
 
 *A lightweight browser history router*
 
-Based on the History API, an instance of the `Route` class helps control how changes in the URL are handled. An application will typically have a single instance of this class (which is similar to the `window.location` singleton).
-
 ## Usage
 
 ### Initialization
