@@ -8,13 +8,15 @@ Based on the History API, an instance of the `Route` class helps control how cha
 
 ## Usage
 
-Initialization:
+### Initialization
 
 ```js
 // route.js
 import {Route} from '@axtk/router';
 export const route = new Route();
 ```
+
+### Events
 
 Adding a handler of an exact URL path:
 
@@ -42,12 +44,6 @@ route.onChange(({path}) => {
 });
 ```
 
-Retrieving the current location:
-
-```js
-console.log(route.href);
-```
-
 Enabling history navigation on existing and future links:
 
 ```js
@@ -57,6 +53,8 @@ route.subscribe('.app a');
 route.subscribe('.content a', document.querySelector('#main'));
 ```
 
+### Matching
+
 Checking a route pattern (or an array thereof) if it matches the current path:
 
 ```js
@@ -64,6 +62,14 @@ Checking a route pattern (or an array thereof) if it matches the current path:
 route.match('/home'); // null
 route.match('/section/42'); // {}
 route.match(/^\/section\/(?<id>\d+)\/?$/); // {0: '42', id: '42'}
+```
+
+### Navigation
+
+Retrieving the current location:
+
+```js
+console.log(route.href);
 ```
 
 Changing the current location to another path:
