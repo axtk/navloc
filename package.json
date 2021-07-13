@@ -4,7 +4,7 @@
   "description": "A lightweight browser history router",
   "main": "dist/index.js",
   "scripts": {
-    "build": "esbuild dist/index.js --bundle --outfile=index.build.js --global-name=Router",
+    "build": "esbuild ./index.ts --bundle --outfile=index.build.js --global-name=Router",
     "build:min": "npm run build -- --minify",
     "test": "node -r esm dist/test.js",
     "tsc": "tsc"

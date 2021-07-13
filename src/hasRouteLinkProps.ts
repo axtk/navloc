@@ -1,3 +1,4 @@
+import {IsomorphicURL} from '../lib/IsomorphicURL';
 import type {LinkProps} from './types';
 
 export const hasRouteLinkProps = ({href, target}: LinkProps): boolean => {
@@ -5,7 +6,7 @@ export const hasRouteLinkProps = ({href, target}: LinkProps): boolean => {
         return false;
 
     try {
-        return new URL(href, window.location.href).origin === window.location.origin;
+        return new IsomorphicURL(href, window.location.href).origin === window.location.origin;
     }
     catch(e) {}
 };
