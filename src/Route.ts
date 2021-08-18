@@ -1,12 +1,19 @@
-import {EventManager, matchPattern, Listener, RemoveListener, MatchParams} from '@axtk/event-manager';
+import {
+    EventManager,
+    Event as EventManagerEvent,
+    matchPattern,
+    MatchParams,
+} from '@axtk/event-manager';
 import {getPath} from './getPath';
 import {isLinkElement} from './isLinkElement';
 import {hasRouteLinkProps} from './hasRouteLinkProps';
 import {
     PathProps,
     RoutePattern,
+    RouteEvent,
     RouteHandler,
     RouteListener,
+    RoutePayload,
     RemoveRouteSubscription,
 } from './types';
 
@@ -16,10 +23,18 @@ export const DefaultPathProps: PathProps = {
     hash: false,
 };
 
+const toRouteEvent = (event: EventManagerEvent): RouteEvent => {
+    const {type, ...eventProps} = event;
+    return {
+        ...eventProps,
+        path: type == null || typeof type === 'object' ? null : String(type),
+    };
+};
+
 export class Route {
     href: string;
     pathProps: PathProps;
-    eventManager: EventManager<RoutePattern, string>;
+    eventManager: EventManager;
 
     constructor(initialPath?: string, pathProps?: PathProps) {
         this.pathProps = {
@@ -33,19 +48,20 @@ export class Route {
         if (typeof window !== 'undefined')
             window.addEventListener('popstate', () => this.dispatch());
     }
-    onChange<P>(handler: RouteHandler<P>): RemoveListener {
-        let listener = this.eventManager.addListener<P>('*', event => {
-            let {type, params, ...props} = event;
-            handler({...props, params, path: type});
+    onChange(handler: RouteHandler): () => void {
+        let listener = this.eventManager.addListener('*', event => {
+            handler(toRouteEvent(event));
         });
         return () => listener.remove();
     }
-    addListener<P>(routePattern: RoutePattern, handler: RouteHandler<P>): RouteListener<P> {
-        return this.eventManager.addListener(routePattern, handler);
+    addListener(routePattern: RoutePattern, handler: RouteHandler): RouteListener {
+        return this.eventManager.addListener(routePattern, event => {
+            handler(toRouteEvent(event));
+        });
     }
-    dispatch<P>(path?: string | null, payload?: P): void {
+    dispatch(path?: string | null, payload?: RoutePayload): void {
         this.href = getPath(path, this.pathProps);
-        this.eventManager.dispatch<P>(this.href, payload);
+        this.eventManager.dispatch(this.href, payload);
     }
     match(routePattern: RoutePattern, path: string = this.href): MatchParams | null {
         return matchPattern(routePattern, path);

@@ -1,19 +1,29 @@
-import type {DispatchedEvent, Event as EventManagerEvent, EventParams, Listener} from '@axtk/event-manager';
+import type {
+    Event as EventManagerEvent,
+    EventPayload,
+    EventListener,
+    MatchParams,
+} from '@axtk/event-manager';
 
 export type RoutePattern = string | RegExp | Array<string | RegExp>;
-export type RouteEvent<P> = Omit<EventManagerEvent<string, P>, 'type' | 'params'> & {path: string, params: EventParams};
-export type RouteHandler<P> = (payload?: RouteEvent<P>) => void;
-export type RouteListener<P> = Omit<Listener<RoutePattern, P>, 'handler'> & {handler: RouteHandler<P>};
+
+export type RouteEvent<T extends EventPayload = {}> = Omit<EventManagerEvent<T>, 'type'> & {
+    path: string | null;
+};
+
+export type RouteHandler = (payload?: RouteEvent) => void;
+export type RouteListener = EventListener;
+export type RoutePayload = EventPayload;
 
 export type PathProps = {
     pathname?: boolean;
     search?: boolean;
     hash?: boolean;
-}
+};
 
 export type RemoveRouteSubscription = () => void;
 
 export type LinkProps = {
     href?: string | null;
     target?: string | null;
-}
+};

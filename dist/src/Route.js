@@ -1,4 +1,4 @@
-import { EventManager, matchPattern } from '@axtk/event-manager';
+import { EventManager, matchPattern, } from '@axtk/event-manager';
 import { getPath } from './getPath';
 import { isLinkElement } from './isLinkElement';
 import { hasRouteLinkProps } from './hasRouteLinkProps';
@@ -6,6 +6,13 @@ export const DefaultPathProps = {
     pathname: true,
     search: false,
     hash: false,
+};
+const toRouteEvent = (event) => {
+    const { type, ...eventProps } = event;
+    return {
+        ...eventProps,
+        path: type == null || typeof type === 'object' ? null : String(type),
+    };
 };
 export class Route {
     href;
@@ -23,13 +30,14 @@ export class Route {
     }
     onChange(handler) {
         let listener = this.eventManager.addListener('*', event => {
-            let { type, params, ...props } = event;
-            handler({ ...props, params, path: type });
+            handler(toRouteEvent(event));
         });
         return () => listener.remove();
     }
     addListener(routePattern, handler) {
-        return this.eventManager.addListener(routePattern, handler);
+        return this.eventManager.addListener(routePattern, event => {
+            handler(toRouteEvent(event));
+        });
     }
     dispatch(path, payload) {
         this.href = getPath(path, this.pathProps);
