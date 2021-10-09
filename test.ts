@@ -1,5 +1,5 @@
 import {SimpleURL} from './lib/IsomorphicURL';
-import {getPath} from './src/getPath';
+import {Route, getPath} from '.';
 
 let url, urlProps;
 
@@ -74,3 +74,33 @@ console.assert(getPath('https://example.com/test') === '/test', 'simple path');
 console.assert(getPath('https://example.com/x/test') === '/x/test', 'simple nested path');
 console.assert(getPath('https://example.com/x/test?z=value') === '/x/test?z=value', 'path with param');
 console.assert(getPath('https://example.com/x/test?z=value', {search: false}) === '/x/test', 'path with disregarded param');
+
+class PathRoute extends Route {
+    calcHref(location) {
+        return getPath(location, {search: false, hash: false});
+    }
+}
+
+let routeURL = '/x/test?z=value#hash-hash';
+
+const route = new Route(routeURL);
+const pathRoute = new PathRoute(routeURL);
+
+console.log('Route vs PathRoute: initial href');
+console.assert(route.href === routeURL, 'Route href');
+console.assert(pathRoute.href === routeURL.split('?')[0], 'PathRoute href');
+
+route.onChange(e => console.log(`route change: ${JSON.stringify(e)}`));
+pathRoute.onChange(({href}) => console.log(`pathRoute change: ${JSON.stringify({href})}`));
+
+route.addListener(/\?z=(?<z>[^&]+)/, e => console.log(`route listener: ${JSON.stringify(e)}`));
+pathRoute.addListener(/^\/(?<section>\w)\/test/, e => console.log(`pathRoute listener: ${JSON.stringify(e)}`));
+
+routeURL = '/y/test?z=none';
+
+route.assign(routeURL);
+pathRoute.assign(routeURL);
+
+console.log('Route vs PathRoute: assigned href');
+console.assert(route.href === routeURL, 'Route href');
+console.assert(pathRoute.href === routeURL.split('?')[0], 'PathRoute href');

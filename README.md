@@ -21,16 +21,16 @@ Adding a handler of an exact URL path:
 ```js
 import {route} from './route';
 
-let routeListener = route.addListener('/home', ({path}) => {
-    console.log(path);
+let routeListener = route.addListener('/home', ({href}) => {
+    console.log(href);
 });
 ```
 
 of a specific URL path pattern:
 
 ```js
-route.addListener(/^\/section\/(?<id>\d+)\/?$/, ({path, params}) => {
-    console.log(path, params.id);
+route.addListener(/^\/section\/(?<id>\d+)\/?$/, ({href, params}) => {
+    console.log(href, params.id);
 });
 ```
 
@@ -40,11 +40,11 @@ and removing a previously created route listener:
 routeListener.remove();
 ```
 
-Tracking all changes:
+Tracking all route changes:
 
 ```js
-let unsubscribe = route.onChange(({path}) => {
-    console.log(path);
+let unsubscribe = route.onChange(({href}) => {
+    console.log(href);
 });
 ```
 
@@ -52,21 +52,6 @@ and unsubscribing from them:
 
 ```js
 unsubscribe();
-```
-
-Enabling history navigation on existing and future links:
-
-```js
-let unsubscribeLinks = route.subscribe('.app a');
-
-// Within a scope of a fixed element:
-route.subscribe('.content a', document.querySelector('#main'));
-```
-
-and canceling it:
-
-```js
-unsubscribeLinks();
 ```
 
 ### Matching
@@ -82,13 +67,13 @@ route.match(/^\/section\/(?<id>\d+)\/?$/); // {0: '42', id: '42'}
 
 ### Navigation
 
-Retrieving the current location:
+Getting the current location:
 
 ```js
 console.log(route.href);
 ```
 
-Changing the current location to another path:
+Changing the current location:
 
 ```js
 // With the current location saved in the browser history
@@ -100,7 +85,7 @@ route.assign('/home');
 route.replace('/home');
 ```
 
-Reloading the current location (by re-dispatching the current path event to the subscribers of `route`):
+Reloading the current location (by re-dispatching the current location event to the subscribers of `route`):
 
 ```js
 route.reload();
@@ -112,6 +97,22 @@ Jumping to browser history entries:
 route.go(-2); // to go 2 entries back in the browser history
 route.back(); // = route.go(-1);
 route.forward(); // = route.go(+1);
+```
+
+### Modifying the behavior
+
+The interaction of a `Route` instance with `window.history` or `window.location` is isolated in a couple of methods that can be overriden in descendant classes to apply custom routing behavior. These methods are: `init`, `transition`, `go`, `calcHref`.
+
+For example: by default, a `Route` instance takes into account changes in the `pathname`, `search`, and `hash` portions of the URL combined. To make a `Route` instance disregard the URL `search` and `hash`, the `Route` class can be extended to redefine the `calcHref` method:
+
+```js
+import {Route, getPath} from '@axtk/router';
+
+export class PathRoute extends Route {
+    calcHref(location) {
+        return getPath(location, {search: false, hash: false});
+    }
+}
 ```
 
 ## Also

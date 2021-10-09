@@ -5,48 +5,77 @@ import {
     MatchParams,
 } from '@axtk/event-manager';
 import {getPath} from './getPath';
-import {isLinkElement} from './isLinkElement';
-import {hasRouteLinkProps} from './hasRouteLinkProps';
+import {isSameOrigin} from './isSameOrigin';
+import {Transition, TransitionType} from './Transition';
 import {
-    PathProps,
     RoutePattern,
     RouteEvent,
     RouteHandler,
     RouteListener,
-    RoutePayload,
-    RemoveRouteSubscription,
+    LocationString,
 } from './types';
-
-export const DefaultPathProps: PathProps = {
-    pathname: true,
-    search: false,
-    hash: false,
-};
 
 const toRouteEvent = (event: EventManagerEvent): RouteEvent => {
     const {type, ...eventProps} = event;
     return {
         ...eventProps,
-        path: type == null || typeof type === 'object' ? null : String(type),
+        href: type == null || typeof type === 'object' ? null : String(type),
     };
-};
+}
 
 export class Route {
-    href: string;
-    pathProps: PathProps;
+    href: LocationString;
     eventManager: EventManager;
 
-    constructor(initialPath?: string, pathProps?: PathProps) {
-        this.pathProps = {
-            ...DefaultPathProps,
-            ...pathProps,
-        };
-
+    constructor(location?: LocationString) {
+        this.href = this.calcHref(location);
         this.eventManager = new EventManager();
-        this.dispatch(initialPath); // sets this.href
-
+        this.init();
+    }
+    init(): void {
         if (typeof window !== 'undefined')
             window.addEventListener('popstate', () => this.dispatch());
+    }
+    /**
+     * Performs the route change.
+     * It can be overridden to apply custom behavior. Returning `false` in certain cases
+     * will prevent the Route instance from updating its `href` and notifying its listeners.
+     */
+    transition(nextLocation: LocationString, type?: TransitionType): boolean | void | undefined {
+        if (typeof window === 'undefined' || nextLocation == null || type == null)
+            return;
+
+        if (!window.history || !isSameOrigin(nextLocation)) {
+            switch (type) {
+                case Transition.ASSIGN:
+                    window.location.assign(nextLocation);
+                    return;
+                case Transition.REPLACE:
+                    window.location.replace(nextLocation);
+                    return;
+            }
+        }
+
+        switch (type) {
+            case Transition.ASSIGN:
+                window.history.pushState({}, '', nextLocation);
+                return;
+            case Transition.REPLACE:
+                window.history.replaceState({}, '', nextLocation);
+                return;
+        }
+    }
+    /*
+     * Jumps the specified number of history entries away from the current entry
+     * (see [`history.go(delta)`](https://developer.mozilla.org/en-US/docs/Web/API/History/go)
+     * and dispatches a new route event (within the `popstate` event handler added in `init()`).
+     */
+    go(delta: number): void {
+        if (typeof window !== 'undefined' && window.history)
+            window.history.go(delta);
+    }
+    calcHref(location?: LocationString): LocationString {
+        return getPath(location);
     }
     onChange(handler: RouteHandler): () => void {
         let listener = this.eventManager.addListener('*', event => {
@@ -59,110 +88,36 @@ export class Route {
             handler(toRouteEvent(event));
         });
     }
-    dispatch(path?: string | null, payload?: RoutePayload): void {
-        this.href = getPath(path, this.pathProps);
-        this.eventManager.dispatch(this.href, payload);
+    dispatch(location?: LocationString, transitionType?: TransitionType): void {
+        if (this.transition(location, transitionType) !== false) {
+            this.href = this.calcHref(location);
+            this.eventManager.dispatch(this.href);
+        }
     }
-    match(routePattern: RoutePattern, path: string = this.href): MatchParams | null {
-        return matchPattern(routePattern, path);
-    }
-    /**
-     * Subscribes HTML links to route changes in order to enable history navigation
-     * without page reloading.
-     *
-     * The target can be a selector, or an HTML element, or a collection of HTML elements.
-     *
-     * @example
-     * ```js
-     * // subscribing existing and future links
-     * route.subscribe('a');
-     * ```
-     */
-    subscribe(
-        target: string | Node | Array<string | Node> | HTMLCollection | NodeList,
-        scope: HTMLElement | Document = document,
-        eventType: string = 'click',
-    ): RemoveRouteSubscription {
-        if (typeof window === 'undefined')
-            return () => {};
-
-        let handler;
-
-        // `target` is a selector
-        if (typeof target === 'string') {
-            scope.addEventListener(eventType, handler = (event: Event) => {
-                let element = event.target instanceof Element ? event.target.closest(target) : null;
-                if (isLinkElement(element) && hasRouteLinkProps(element)) {
-                    event.preventDefault();
-                    this.assign(getPath(element.href));
-                }
-            });
-
-            return () => {
-                scope.removeEventListener(eventType, handler);
-            };
-        }
-
-        else if (isLinkElement(target)) {
-            target.addEventListener(eventType, handler = (event: Event) => {
-                if (hasRouteLinkProps(target)) {
-                    event.preventDefault();
-                    this.assign(getPath(target.href));
-                }
-            });
-
-            return () => {
-                target.removeEventListener(eventType, handler);
-            };
-        }
-
-        else if (Array.isArray(target) || target instanceof NodeList || target instanceof HTMLCollection) {
-            let unsubscriptions = Array.from(target).map(item => this.subscribe(item, scope, eventType));
-
-            return () => {
-                for (let unsubscribe of unsubscriptions)
-                    unsubscribe();
-            };
-        }
-
-        return () => {};
+    match(routePattern: RoutePattern, location: LocationString = this.href): MatchParams | null {
+        return matchPattern(routePattern, location);
     }
     /**
      * Adds an entry to the browser's session history
      * (see [`history.pushState()`](https://developer.mozilla.org/en-US/docs/Web/API/History/pushState)
-     * and dispatches a new path event.
+     * and dispatches a new route event.
      */
-    assign(path: string): void {
-        if (typeof history !== 'undefined') {
-            history.pushState({}, '', path);
-            this.dispatch(path);
-        }
+    assign(location: LocationString): void {
+        this.dispatch(location, Transition.ASSIGN);
     }
     /**
      * Replaces the current history entry
      * (see [`history.replaceState()`](https://developer.mozilla.org/en-US/docs/Web/API/History/replaceState)
-     * and dispatches a new path event.
+     * and dispatches a new route event.
      */
-    replace(path: string): void {
-        if (typeof history !== 'undefined') {
-            history.replaceState({}, '', path);
-            this.dispatch(path);
-        }
+    replace(location: LocationString): void {
+        this.dispatch(location, Transition.REPLACE);
     }
     /**
-     * Re-dispatches the current path event.
+     * Re-dispatches the current route event.
      */
     reload(): void {
         this.dispatch();
-    }
-    /*
-     * Jumps the specified number of history entries away from the current entry
-     * (see [`history.go(delta)`](https://developer.mozilla.org/en-US/docs/Web/API/History/go)
-     * and dispatches a new path event (within the `popstate` handler).
-     */
-    go(delta: number): void {
-        if (typeof history !== 'undefined')
-            history.go(delta);
     }
     back(): void {
         this.go(-1);
@@ -174,6 +129,6 @@ export class Route {
      * Returns the current full path, same as `.href`.
      */
     toString(): string {
-        return this.href;
+        return this.href || '';
     }
 }
