@@ -2,7 +2,11 @@
 
 # @axtk/router
 
-*A lightweight browser history router*
+Core ideas:
+
+- The route navigation interface might be similar to `window.location` (`route.href`, `route.assign()`, `route.replace()`).
+- Routes might be handled as arbitrary plain strings, with their nestedness being irrelevant.
+- Regular expressions might be sufficient to express pattern-wise route matching (especially with the advent of the named capturing groups) instead of pattern strings, reserving fixed strings for exact route matching.
 
 ## Usage
 
@@ -14,7 +18,7 @@ import {Route} from '@axtk/router';
 export const route = new Route();
 ```
 
-### Events
+### Subscription to URL changes
 
 Adding a handler of an exact URL path:
 
