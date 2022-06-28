@@ -2,7 +2,7 @@
     "include": [
         "src/**/*.ts",
         "index.ts",
-        "test.ts"
+        "tests.ts"
     ],
     "compilerOptions": {
         "lib": ["esnext", "dom"],

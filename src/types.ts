@@ -1,17 +1,16 @@
 import type {
     Event as EventManagerEvent,
-    EventPayload,
     EventListener,
-} from '@axtk/event-manager';
+} from 'evtm';
 
-export type RoutePattern = string | RegExp | Array<string | RegExp>;
+export type LocationPattern = string | RegExp | Array<string | RegExp>;
 
-export type RouteEvent<T extends EventPayload = {}> = Omit<EventManagerEvent<T>, 'type'> & {
+export type LocationEvent<T = unknown> = Omit<EventManagerEvent<T>, 'type'> & {
     href: string | null;
 };
 
-export type RouteHandler = (event?: RouteEvent) => void;
-export type RouteListener = EventListener;
+export type LocationEventHandler = (event?: LocationEvent) => void;
+export type LocationListener = EventListener;
 
 export type PathProps = {
     pathname?: boolean;

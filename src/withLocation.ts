@@ -1,18 +1,17 @@
-import type {Route} from './Route';
-import type {RoutePattern} from './types';
+import type {MatchParams} from 'evtm';
+import type {Location} from './Location';
+import type {LocationPattern} from './types';
 
-export interface MatchPayload {
+export type MatchPayload = {
     path: string;
-    params: {
-        [key: string]: string;
-    };
-}
+    params: MatchParams;
+};
 
 export type MatchHandler<T> = (payload?: MatchPayload) => T;
 
-export const withRoute = (route: Route) => {
+export const withLocation = (route: Location) => {
     return <X = undefined, Y = undefined>(
-        routePattern: RoutePattern,
+        routePattern: LocationPattern,
         matchOutput?: X | MatchHandler<X>,
         unmatchOutput?: Y | MatchHandler<Y>,
     ): X | Y => {

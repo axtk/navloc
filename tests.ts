@@ -1,5 +1,6 @@
 import {SimpleURL} from './lib/IsomorphicURL';
-import {Route, getPath} from '.';
+import {Location} from './src/Location';
+import {getPath} from './src/getPath';
 
 let url, urlProps;
 
@@ -75,32 +76,32 @@ console.assert(getPath('https://example.com/x/test') === '/x/test', 'simple nest
 console.assert(getPath('https://example.com/x/test?z=value') === '/x/test?z=value', 'path with param');
 console.assert(getPath('https://example.com/x/test?z=value', {search: false}) === '/x/test', 'path with disregarded param');
 
-class PathRoute extends Route {
-    calcHref(location) {
+class PathLocation extends Location {
+    deriveHref(location) {
         return getPath(location, {search: false, hash: false});
     }
 }
 
-let routeURL = '/x/test?z=value#hash-hash';
+let locationURL = '/x/test?z=value#hash-hash';
 
-const route = new Route(routeURL);
-const pathRoute = new PathRoute(routeURL);
+const location = new Location(locationURL);
+const pathLocation = new PathLocation(locationURL);
 
-console.log('Route vs PathRoute: initial href');
-console.assert(route.href === routeURL, 'Route href');
-console.assert(pathRoute.href === routeURL.split('?')[0], 'PathRoute href');
+console.log('Location vs PathLocation: initial href');
+console.assert(location.href === locationURL, 'Location href');
+console.assert(pathLocation.href === locationURL.split('?')[0], 'PathLocation href');
 
-route.onChange(e => console.log(`route change: ${JSON.stringify(e)}`));
-pathRoute.onChange(({href}) => console.log(`pathRoute change: ${JSON.stringify({href})}`));
+location.onChange(e => console.log(`location change: ${JSON.stringify(e)}`));
+pathLocation.onChange(({href}) => console.log(`pathLocation change: ${JSON.stringify({href})}`));
 
-route.addListener(/\?z=(?<z>[^&]+)/, e => console.log(`route listener: ${JSON.stringify(e)}`));
-pathRoute.addListener(/^\/(?<section>\w)\/test/, e => console.log(`pathRoute listener: ${JSON.stringify(e)}`));
+location.addListener(/\?z=(?<z>[^&]+)/, e => console.log(`location listener: ${JSON.stringify(e)}`));
+pathLocation.addListener(/^\/(?<section>\w)\/test/, e => console.log(`pathLocation listener: ${JSON.stringify(e)}`));
 
-routeURL = '/y/test?z=none';
+locationURL = '/y/test?z=none';
 
-route.assign(routeURL);
-pathRoute.assign(routeURL);
+location.assign(locationURL);
+pathLocation.assign(locationURL);
 
-console.log('Route vs PathRoute: assigned href');
-console.assert(route.href === routeURL, 'Route href');
-console.assert(pathRoute.href === routeURL.split('?')[0], 'PathRoute href');
+console.log('Location vs PathLocation: assigned href');
+console.assert(location.href === locationURL, 'Location href');
+console.assert(pathLocation.href === locationURL.split('?')[0], 'PathLocation href');

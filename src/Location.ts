@@ -3,19 +3,19 @@ import {
     Event as EventManagerEvent,
     matchPattern,
     MatchParams,
-} from '@axtk/event-manager';
+} from 'evtm';
 import {getPath} from './getPath';
 import {isSameOrigin} from './isSameOrigin';
 import {Transition, TransitionType} from './Transition';
 import {
-    RoutePattern,
-    RouteEvent,
-    RouteHandler,
-    RouteListener,
+    LocationPattern,
+    LocationEvent,
+    LocationEventHandler,
+    LocationListener,
     LocationString,
 } from './types';
 
-const toRouteEvent = (event: EventManagerEvent): RouteEvent => {
+const toLocationEvent = (event: EventManagerEvent): LocationEvent => {
     const {type, ...eventProps} = event;
     return {
         ...eventProps,
@@ -23,16 +23,16 @@ const toRouteEvent = (event: EventManagerEvent): RouteEvent => {
     };
 }
 
-export class Route {
+export class Location {
     href: LocationString;
     eventManager: EventManager;
 
     constructor(location?: LocationString) {
-        this.href = this.calcHref(location);
+        this.href = this.deriveHref(location);
         this.eventManager = new EventManager();
-        this.init();
+        this.initialize();
     }
-    init(): void {
+    initialize(): void {
         if (typeof window !== 'undefined')
             window.addEventListener('popstate', () => this.dispatch());
     }
@@ -68,34 +68,37 @@ export class Route {
     /*
      * Jumps the specified number of history entries away from the current entry
      * (see [`history.go(delta)`](https://developer.mozilla.org/en-US/docs/Web/API/History/go)
-     * and dispatches a new route event (within the `popstate` event handler added in `init()`).
+     * and dispatches a new route event (within the `popstate` event handler added in `initialize()`).
      */
     go(delta: number): void {
         if (typeof window !== 'undefined' && window.history)
             window.history.go(delta);
     }
-    calcHref(location?: LocationString): LocationString {
+    deriveHref(location?: LocationString): LocationString {
         return getPath(location);
     }
-    onChange(handler: RouteHandler): () => void {
+    onChange(handler: LocationEventHandler): () => void {
         let listener = this.eventManager.addListener('*', event => {
-            handler(toRouteEvent(event));
+            handler(toLocationEvent(event));
         });
         return () => listener.remove();
     }
-    addListener(routePattern: RoutePattern, handler: RouteHandler): RouteListener {
+    addListener(routePattern: LocationPattern, handler: LocationEventHandler): LocationListener {
         return this.eventManager.addListener(routePattern, event => {
-            handler(toRouteEvent(event));
+            handler(toLocationEvent(event));
         });
     }
     dispatch(location?: LocationString, transitionType?: TransitionType): void {
         if (this.transition(location, transitionType) !== false) {
-            this.href = this.calcHref(location);
+            this.href = this.deriveHref(location);
             this.eventManager.dispatch(this.href);
         }
     }
-    match(routePattern: RoutePattern, location: LocationString = this.href): MatchParams | null {
+    match(routePattern: LocationPattern, location: LocationString = this.href): MatchParams | null {
         return matchPattern(routePattern, location);
+    }
+    matches(routePattern: LocationPattern, location: LocationString = this.href): boolean {
+        return this.match(routePattern, location) !== null;
     }
     /**
      * Adds an entry to the browser's session history
