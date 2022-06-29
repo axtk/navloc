@@ -37,9 +37,9 @@ export class Location {
             window.addEventListener('popstate', () => this.dispatch());
     }
     /**
-     * Performs the route change.
+     * Performs the location change.
      * It can be overridden to apply custom behavior. Returning `false` in certain cases
-     * will prevent the Route instance from updating its `href` and notifying its listeners.
+     * will prevent the Location instance from updating its `href` and notifying its listeners.
      */
     transition(nextLocation: LocationString, type?: TransitionType): boolean | void | undefined {
         if (typeof window === 'undefined' || nextLocation == null || type == null)
@@ -68,7 +68,7 @@ export class Location {
     /*
      * Jumps the specified number of history entries away from the current entry
      * (see [`history.go(delta)`](https://developer.mozilla.org/en-US/docs/Web/API/History/go)
-     * and dispatches a new route event (within the `popstate` event handler added in `initialize()`).
+     * and dispatches a new location event (within the `popstate` event handler added in `initialize()`).
      */
     go(delta: number): void {
         if (typeof window !== 'undefined' && window.history)
@@ -83,8 +83,8 @@ export class Location {
         });
         return () => listener.remove();
     }
-    addListener(routePattern: LocationPattern, handler: LocationEventHandler): LocationListener {
-        return this.eventManager.addListener(routePattern, event => {
+    addListener(locationPattern: LocationPattern, handler: LocationEventHandler): LocationListener {
+        return this.eventManager.addListener(locationPattern, event => {
             handler(toLocationEvent(event));
         });
     }
@@ -94,16 +94,16 @@ export class Location {
             this.eventManager.dispatch(this.href);
         }
     }
-    match(routePattern: LocationPattern, location: LocationString = this.href): MatchParams | null {
-        return matchPattern(routePattern, location);
+    match(locationPattern: LocationPattern, location: LocationString = this.href): MatchParams | null {
+        return matchPattern(locationPattern, location);
     }
-    matches(routePattern: LocationPattern, location: LocationString = this.href): boolean {
-        return this.match(routePattern, location) !== null;
+    matches(locationPattern: LocationPattern, location: LocationString = this.href): boolean {
+        return this.match(locationPattern, location) !== null;
     }
     /**
      * Adds an entry to the browser's session history
      * (see [`history.pushState()`](https://developer.mozilla.org/en-US/docs/Web/API/History/pushState)
-     * and dispatches a new route event.
+     * and dispatches a new location event.
      */
     assign(location: LocationString): void {
         this.dispatch(location, Transition.ASSIGN);
@@ -111,13 +111,13 @@ export class Location {
     /**
      * Replaces the current history entry
      * (see [`history.replaceState()`](https://developer.mozilla.org/en-US/docs/Web/API/History/replaceState)
-     * and dispatches a new route event.
+     * and dispatches a new location event.
      */
     replace(location: LocationString): void {
         this.dispatch(location, Transition.REPLACE);
     }
     /**
-     * Re-dispatches the current route event.
+     * Re-dispatches the current location event.
      */
     reload(): void {
         this.dispatch();

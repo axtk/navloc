@@ -1,4 +1,4 @@
-[![npm](https://img.shields.io/npm/v/histloc?labelColor=royalblue&color=royalblue&style=flat-square)](https://www.npmjs.com/package/histloc) [![GitHub](https://img.shields.io/badge/-GitHub-royalblue?labelColor=royalblue&color=royalblue&style=flat-square&logo=github)](https://github.com/axtk/router) ![browser](https://img.shields.io/badge/browser-✓-345?labelColor=345&color=345&style=flat-square) ![TypeScript](https://img.shields.io/badge/TypeScript-✓-345?labelColor=345&color=345&style=flat-square)
+[![npm](https://img.shields.io/npm/v/histloc?labelColor=royalblue&color=royalblue&style=flat-square)](https://www.npmjs.com/package/histloc) [![GitHub](https://img.shields.io/badge/-GitHub-royalblue?labelColor=royalblue&color=royalblue&style=flat-square&logo=github)](https://github.com/axtk/histloc) ![browser](https://img.shields.io/badge/browser-✓-345?labelColor=345&color=345&style=flat-square) ![TypeScript](https://img.shields.io/badge/TypeScript-✓-345?labelColor=345&color=345&style=flat-square)
 
 # histloc
 
@@ -99,8 +99,8 @@ Jumping to browser history entries:
 
 ```js
 location.go(-2); // to go 2 entries back in the browser history
-location.back(); // = route.go(-1);
-location.forward(); // = route.go(+1);
+location.back(); // = location.go(-1);
+location.forward(); // = location.go(+1);
 ```
 
 ### Custom behavior

@@ -9,14 +9,14 @@ export type MatchPayload = {
 
 export type MatchHandler<T> = (payload?: MatchPayload) => T;
 
-export const withLocation = (route: Location) => {
+export const withLocation = (location: Location) => {
     return <X = undefined, Y = undefined>(
-        routePattern: LocationPattern,
+        locationPattern: LocationPattern,
         matchOutput?: X | MatchHandler<X>,
         unmatchOutput?: Y | MatchHandler<Y>,
     ): X | Y => {
-        let matches = route.match(routePattern);
-        let payload = {path: route.href, params: matches || {}};
+        let matches = location.match(locationPattern);
+        let payload = {path: location.href, params: matches || {}};
 
         return matches === null ?
             (typeof unmatchOutput === 'function' ? (unmatchOutput as MatchHandler<Y>)(payload) : unmatchOutput) :
