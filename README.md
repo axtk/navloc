@@ -59,14 +59,29 @@ unsubscribe();
 Checking a location pattern (or an array thereof) if it matches the current path:
 
 ```js
-// Provided that the current location is '/section/42':
+// Provided that the current location is '/item/42':
 location.match('/home'); // null
-location.match('/section/42'); // {}
-location.match(/^\/section\/(?<id>\d+)\/?$/); // {0: '42', id: '42'}
+location.match('/item/42'); // {}
+location.match(/^\/item\/(?<id>\d+)\/?$/); // {0: '42', id: '42'}
 
 location.matches('/home'); // false
-location.matches('/section/42'); // true
-location.matches(/^\/section\/(?<id>\d+)\/?$/); // true
+location.matches('/item/42'); // true
+location.matches(/^\/item\/(?<id>\d+)\/?$/); // true
+```
+
+The `evaluate()` method works much like the conditional ternary operator (`condition ? x : y`): if the current location matches the given location pattern it returns based on the second argument and falls back to the third argument otherwise.
+
+```js
+// Provided that the current location is '/item/42':
+location.evaluate('/home', 1, 0); // 0
+location.evaluate('/item/42', 'a', 'b'); // 'a'
+location.evaluate(/^\/item\/(?<id>\d+)\/?$/, 5); // 5
+
+// If the second or the third argument is a function it will be called
+// with `{path, params}` as its argument.
+location.evaluate('/home', () => 1, ({path}) => path); // '/item/42'
+location.evaluate(/^\/item\/(?<id>\d+)\/?$/, ({params}) => params.id);
+// 42
 ```
 
 ### Navigation
@@ -105,9 +120,9 @@ location.forward(); // = location.go(+1);
 
 ### Custom behavior
 
-The interaction of a `Location` instance with `window.history` or `window.location` is isolated in a number of methods that can be overriden in descendant classes to apply custom behavior. These methods are: `initialize`, `transition`, `go`, `deriveHref`.
+The interaction of a `Location` instance with `window.history` or `window.location` is isolated in a number of methods that can be overriden in descendant classes to apply custom behavior. These methods are: `initialize()`, `transition()`, `go()`, `deriveHref()`.
 
-For example: By default, a `Location` instance derives its `href` from the `pathname`, `search`, and `hash` portions of the URL combined. To make a `Location` instance disregard the URL `search` and `hash`, the `Location` class can be extended to redefine the `deriveHref` method:
+For example: By default, a `Location` instance derives its `href` from the `pathname`, `search`, and `hash` portions of the URL combined. To make a `Location` instance disregard the URL `search` and `hash`, the `Location` class can be extended to redefine the `deriveHref()` method:
 
 ```js
 import {Location, getPath} from 'histloc';

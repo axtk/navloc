@@ -73,8 +73,8 @@ for (let [k, v] of Object.entries(urlProps))
 console.log('getPath');
 console.assert(getPath('https://example.com/test') === '/test', 'simple path');
 console.assert(getPath('https://example.com/x/test') === '/x/test', 'simple nested path');
-console.assert(getPath('https://example.com/x/test?z=value') === '/x/test?z=value', 'path with param');
-console.assert(getPath('https://example.com/x/test?z=value', {search: false}) === '/x/test', 'path with disregarded param');
+console.assert(getPath('https://example.com/x/test?q=value') === '/x/test?q=value', 'path with param');
+console.assert(getPath('https://example.com/x/test?q=value', {search: false}) === '/x/test', 'path with disregarded param');
 
 class PathLocation extends Location {
     deriveHref(location) {
@@ -82,7 +82,7 @@ class PathLocation extends Location {
     }
 }
 
-let locationURL = '/x/test?z=value#hash-hash';
+let locationURL = '/x/test?q=value#hash-hash';
 
 const location = new Location(locationURL);
 const pathLocation = new PathLocation(locationURL);
@@ -94,10 +94,10 @@ console.assert(pathLocation.href === locationURL.split('?')[0], 'PathLocation hr
 location.onChange(e => console.log(`location change: ${JSON.stringify(e)}`));
 pathLocation.onChange(({href}) => console.log(`pathLocation change: ${JSON.stringify({href})}`));
 
-location.addListener(/\?z=(?<z>[^&]+)/, e => console.log(`location listener: ${JSON.stringify(e)}`));
+location.addListener(/\?q=(?<q>[^&]+)/, e => console.log(`location listener: ${JSON.stringify(e)}`));
 pathLocation.addListener(/^\/(?<section>\w)\/test/, e => console.log(`pathLocation listener: ${JSON.stringify(e)}`));
 
-locationURL = '/y/test?z=none';
+locationURL = '/y/test?q=none';
 
 location.assign(locationURL);
 pathLocation.assign(locationURL);
@@ -105,3 +105,32 @@ pathLocation.assign(locationURL);
 console.log('Location vs PathLocation: assigned href');
 console.assert(location.href === locationURL, 'Location href');
 console.assert(pathLocation.href === locationURL.split('?')[0], 'PathLocation href');
+
+let match = location.match(/^\/(?<section>\w)\/(?<subsection>\w+)\/?\?q=(?<value>[^&]+)/)!;
+
+console.log('match params');
+console.assert(match.section === 'y', 'match section');
+console.assert(match.subsection === 'test', 'match subsection');
+console.assert(match.value === 'none', 'match value');
+
+locationURL = '/item/42';
+location.assign(locationURL);
+
+console.log('.match()');
+console.assert(location.match('/home') === null, 'mismatch');
+console.assert(JSON.stringify(location.match('/item/42')) === '{}', 'string match');
+console.assert(JSON.stringify(location.match(/^\/item\/(?<id>\d+)\/?$/)) === '{"0":"42","id":"42"}', 'regexp match');
+
+console.log('.matches()');
+console.assert(location.matches('/home') === false, 'boolean mismatch');
+console.assert(location.matches('/item/42') === true, 'boolean string match');
+console.assert(location.matches(/^\/item\/(?<id>\d+)\/?$/) === true, 'boolean regexp match');
+
+console.log('.evaluate()');
+console.assert(location.evaluate('/home', 1, 0) === 0, 'eval mismatch');
+console.assert(location.evaluate('/item/42', 'a', 'b') === 'a', 'eval match');
+console.assert(location.evaluate(/^\/item\/(?<id>\d+)\/?$/, 5) === 5, 'regexp eval match');
+
+console.log('.evaluate() fn');
+console.assert(location.evaluate('/home', () => 1, ({path}) => path) === '/item/42', 'eval fn string mismatch');
+console.assert(location.evaluate(/^\/item\/(?<id>\d+)\/?$/, ({params}) => params.id) === '42', 'eval fn regexp match');

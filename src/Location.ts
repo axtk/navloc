@@ -13,6 +13,7 @@ import {
     LocationEventHandler,
     LocationListener,
     LocationString,
+    MatchHandler,
 } from './types';
 
 const toLocationEvent = (event: EventManagerEvent): LocationEvent => {
@@ -94,11 +95,37 @@ export class Location {
             this.eventManager.dispatch(this.href);
         }
     }
-    match(locationPattern: LocationPattern, location: LocationString = this.href): MatchParams | null {
-        return matchPattern(locationPattern, location);
+    /**
+     * Matches the current location against the location pattern.
+     */
+    match(locationPattern: LocationPattern): MatchParams | null {
+        return matchPattern(locationPattern, this.href);
     }
-    matches(locationPattern: LocationPattern, location: LocationString = this.href): boolean {
-        return this.match(locationPattern, location) !== null;
+    /**
+     * Checks whether the current location matches the location pattern.
+     */
+    matches(locationPattern: LocationPattern): boolean {
+        return matchPattern(locationPattern, this.href) !== null;
+    }
+    /**
+     * Loosely resembles the conditional ternary operator (`condition ? x : y`):
+     * if the current location matches the location pattern the returned value
+     * is based on the second argument, otherwise on the third argument.
+     *
+     * `.evaluate(locationPattern, x, y)` returns either `x({path, params})` or
+     * `y({path, params})` if they are functions, `x` or `y` themselves otherwise.
+     */
+    evaluate<X = undefined, Y = undefined>(
+        locationPattern: LocationPattern,
+        matchOutput?: X | MatchHandler<X>,
+        mismatchOutput?: Y | MatchHandler<Y>,
+    ): X | Y {
+        let matches = matchPattern(locationPattern, this.href);
+        let payload = {path: this.href, params: matches || {}};
+
+        return matches === null ?
+            (typeof mismatchOutput === 'function' ? (mismatchOutput as MatchHandler<Y>)(payload) : mismatchOutput) :
+            (typeof matchOutput === 'function' ? (matchOutput as MatchHandler<X>)(payload) : matchOutput);
     }
     /**
      * Adds an entry to the browser's session history

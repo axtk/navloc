@@ -1,6 +1,7 @@
 import type {
     Event as EventManagerEvent,
     EventListener,
+    MatchParams,
 } from 'evtm';
 
 export type LocationPattern = string | RegExp | Array<string | RegExp>;
@@ -19,3 +20,10 @@ export type PathProps = {
 };
 
 export type LocationString = string | null | undefined;
+
+export type MatchPayload = {
+    path: string;
+    params: MatchParams;
+};
+
+export type MatchHandler<T> = (payload?: MatchPayload) => T;
