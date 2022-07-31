@@ -1,6 +1,7 @@
 import {SimpleURL} from './lib/IsomorphicURL';
 import {Location} from './src/Location';
 import {getPath} from './src/getPath';
+import type {LocationString} from './src/types';
 
 let url, urlProps;
 
@@ -15,7 +16,7 @@ urlProps = {
 
 console.log(`new SimpleURL('https://c.cc:80/a/b/c?d=e#hi')`);
 for (let [k, v] of Object.entries(urlProps))
-    console.assert(url[k] === v, k);
+    console.assert(url[k as keyof SimpleURL] === v, k);
 
 url = new SimpleURL('https://c.cc/x/yz#hi', 'https://example.com');
 urlProps = {
@@ -28,7 +29,7 @@ urlProps = {
 
 console.log(`new SimpleURL('https://c.cc/x/yz#hi', 'https://example.com')`);
 for (let [k, v] of Object.entries(urlProps))
-    console.assert(url[k] === v, k);
+    console.assert(url[k as keyof SimpleURL] === v, k);
 
 url = new SimpleURL('/x/yz?q=123&a=b', 'https://example.com/test');
 urlProps = {
@@ -41,7 +42,7 @@ urlProps = {
 
 console.log(`new SimpleURL('/x/yz?q=123&a=b', 'https://example.com')`);
 for (let [k, v] of Object.entries(urlProps))
-    console.assert(url[k] === v, k);
+    console.assert(url[k as keyof SimpleURL] === v, k);
 
 url = new SimpleURL('test', 'https://example.com/x');
 urlProps = {
@@ -54,7 +55,7 @@ urlProps = {
 
 console.log(`new SimpleURL('test', 'https://example.com/x')`);
 for (let [k, v] of Object.entries(urlProps))
-    console.assert(url[k] === v, k);
+    console.assert(url[k as keyof SimpleURL] === v, k);
 
 // @ts-ignore numeric arg instead of string
 url = new SimpleURL(10, 'https://example.com');
@@ -68,7 +69,7 @@ urlProps = {
 
 console.log(`new SimpleURL(10, 'https://example.com')`);
 for (let [k, v] of Object.entries(urlProps))
-    console.assert(url[k] === v, k);
+    console.assert(url[k as keyof SimpleURL] === v, k);
 
 console.log('getPath');
 console.assert(getPath('https://example.com/test') === '/test', 'simple path');
@@ -77,7 +78,7 @@ console.assert(getPath('https://example.com/x/test?q=value') === '/x/test?q=valu
 console.assert(getPath('https://example.com/x/test?q=value', {search: false}) === '/x/test', 'path with disregarded param');
 
 class PathLocation extends Location {
-    deriveHref(location) {
+    deriveHref(location?: LocationString) {
         return getPath(location, {search: false, hash: false});
     }
 }

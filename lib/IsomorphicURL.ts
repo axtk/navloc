@@ -16,7 +16,7 @@ export class SimpleURL {
         let locationParts = (location && location.match(urlRegExp)) || [];
         let originParts = (origin && origin.match(urlRegExp)) || [];
 
-        if (!locationParts[4] && !origin[4])
+        if (!locationParts[4] && !originParts[4])
             throw new Error('Invalid URL');
 
         this.origin = locationParts[4] ? locationParts[1] + locationParts[3] : originParts[1] + originParts[3];

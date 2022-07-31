@@ -119,7 +119,7 @@ export class Location {
         locationPattern: LocationPattern,
         matchOutput?: X | MatchHandler<X>,
         mismatchOutput?: Y | MatchHandler<Y>,
-    ): X | Y {
+    ): X | Y | undefined {
         let matches = matchPattern(locationPattern, this.href);
         let payload = {path: this.href, params: matches || {}};
 

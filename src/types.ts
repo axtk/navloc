@@ -10,7 +10,7 @@ export type LocationEvent<T = unknown> = Omit<EventManagerEvent<T>, 'type'> & {
     href: string | null;
 };
 
-export type LocationEventHandler = (event?: LocationEvent) => void;
+export type LocationEventHandler = (event: LocationEvent) => void;
 export type LocationListener = EventListener;
 
 export type PathProps = {
@@ -22,8 +22,8 @@ export type PathProps = {
 export type LocationString = string | null | undefined;
 
 export type MatchPayload = {
-    path: string;
+    path: LocationString;
     params: MatchParams;
 };
 
-export type MatchHandler<T> = (payload?: MatchPayload) => T;
+export type MatchHandler<T> = (payload: MatchPayload) => T;
