@@ -133,5 +133,5 @@ console.assert(location.evaluate('/item/42', 'a', 'b') === 'a', 'eval match');
 console.assert(location.evaluate(/^\/item\/(?<id>\d+)\/?$/, 5) === 5, 'regexp eval match');
 
 console.log('.evaluate() fn');
-console.assert(location.evaluate('/home', () => 1, ({path}) => path) === '/item/42', 'eval fn string mismatch');
+console.assert(location.evaluate('/home', () => 1, ({href}) => href) === '/item/42', 'eval fn string mismatch');
 console.assert(location.evaluate(/^\/item\/(?<id>\d+)\/?$/, ({params}) => params.id) === '42', 'eval fn regexp match');

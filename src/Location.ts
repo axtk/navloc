@@ -20,7 +20,7 @@ const toLocationEvent = (event: EventManagerEvent): LocationEvent => {
     const {type, ...eventProps} = event;
     return {
         ...eventProps,
-        href: type == null || typeof type === 'object' ? null : String(type),
+        href: typeof type === 'string' ? type : null,
     };
 }
 
@@ -112,8 +112,8 @@ export class Location {
      * if the current location matches the location pattern the returned value
      * is based on the second argument, otherwise on the third argument.
      *
-     * `.evaluate(locationPattern, x, y)` returns either `x({path, params})` or
-     * `y({path, params})` if they are functions, `x` or `y` themselves otherwise.
+     * `.evaluate(locationPattern, x, y)` returns either `x({href, params})` or
+     * `y({href, params})` if they are functions, `x` or `y` themselves otherwise.
      */
     evaluate<X = undefined, Y = undefined>(
         locationPattern: LocationPattern,
@@ -121,7 +121,7 @@ export class Location {
         mismatchOutput?: Y | MatchHandler<Y>,
     ): X | Y | undefined {
         let matches = matchPattern(locationPattern, this.href);
-        let payload = {path: this.href, params: matches || {}};
+        let payload = {href: this.href, params: matches || {}};
 
         return matches === null ?
             (typeof mismatchOutput === 'function' ? (mismatchOutput as MatchHandler<Y>)(payload) : mismatchOutput) :
@@ -156,7 +156,7 @@ export class Location {
         this.go(1);
     }
     /**
-     * Returns the current full path, same as `.href`.
+     * Returns the current location, equals `.href` with a fallback to an empty string.
      */
     toString(): string {
         return this.href || '';

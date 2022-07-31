@@ -22,7 +22,7 @@ export type PathProps = {
 export type LocationString = string | null | undefined;
 
 export type MatchPayload = {
-    path: LocationString;
+    href: LocationString;
     params: MatchParams;
 };
 

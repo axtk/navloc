@@ -78,8 +78,8 @@ location.evaluate('/item/42', 'a', 'b'); // 'a'
 location.evaluate(/^\/item\/(?<id>\d+)\/?$/, 5); // 5
 
 // If the second or the third argument is a function it will be called
-// with `{path, params}` as its argument.
-location.evaluate('/home', () => 1, ({path}) => path); // '/item/42'
+// with `{href, params}` as its argument.
+location.evaluate('/home', () => 1, ({href}) => href); // '/item/42'
 location.evaluate(/^\/item\/(?<id>\d+)\/?$/, ({params}) => params.id);
 // 42
 ```
