@@ -1,6 +1,6 @@
 {
   "name": "navloc",
-  "version": "5.0.1",
+  "version": "6.0.0",
   "description": "A window.location-like browser history location implementation with events",
   "main": "dist/index.js",
   "type": "module",
