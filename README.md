@@ -69,7 +69,7 @@ location.matches('/item/42'); // true
 location.matches(/^\/item\/(?<id>\d+)\/?$/); // true
 ```
 
-The `evaluate()` method works much like the conditional ternary operator (`condition ? x : y`): if the current location matches the given location pattern it returns based on the second argument and falls back to the third argument otherwise.
+The `evaluate()` method works much like the conditional ternary operator (`condition ? x : y`): if the current location matches the given location pattern its returned value is based on the second parameter and falls back to the third parameter otherwise.
 
 ```js
 // Provided that the current location is '/item/42':
@@ -77,8 +77,8 @@ location.evaluate('/home', 1, 0); // 0
 location.evaluate('/item/42', 'a', 'b'); // 'a'
 location.evaluate(/^\/item\/(?<id>\d+)\/?$/, 5); // 5
 
-// If the second or the third argument is a function it will be called
-// with `{href, params}` as its argument.
+// If the second or the third parameter is a function it will be
+// called with `{ href, params }` as its parameter.
 location.evaluate('/home', () => 1, ({ href }) => href); // '/item/42'
 location.evaluate(/^\/item\/(?<id>\d+)\/?$/, ({ params }) => params.id);
 // 42
