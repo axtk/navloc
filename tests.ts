@@ -1,4 +1,4 @@
-import {SimpleURL} from './lib/IsomorphicURL';
+import {SimpleURL} from './lib/SimpleURL';
 import {NavigationLocation} from './src/NavigationLocation';
 import {getPath} from './src/getPath';
 import type {LocationString} from './src/types';
@@ -88,8 +88,8 @@ let locationURL = '/x/test?q=value#hash-hash';
 const location = new NavigationLocation(locationURL);
 const pathLocation = new PathLocation(locationURL);
 
-console.log('Location vs PathLocation: initial href');
-console.assert(location.href === locationURL, 'Location href');
+console.log('NavigationLocation vs PathLocation: initial href');
+console.assert(location.href === locationURL, 'NavigationLocation href');
 console.assert(pathLocation.href === locationURL.split('?')[0], 'PathLocation href');
 
 location.onChange(e => console.log(`location change: ${JSON.stringify(e)}`));
