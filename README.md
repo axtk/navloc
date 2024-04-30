@@ -2,7 +2,7 @@
 
 # navloc
 
-The `Location` class introduced in this package produces a browser history location object with an API similar to `window.location` (`.href`, `.assign()`, `.replace()`).
+The `NavigationLocation` class introduced in this package produces a browser history location object with an API similar to `window.location` (`.href`, `.assign()`, `.replace()`).
 
 As an extension to the `window.location` interface, this class exposes methods for subscription to changes of the browser history and for pattern matching.
 
@@ -11,8 +11,8 @@ As an extension to the `window.location` interface, this class exposes methods f
 ### Initialization
 
 ```js
-import { Location } from 'navloc';
-export const location = new Location();
+import { NavigationLocation } from 'navloc';
+export const location = new NavigationLocation();
 ```
 
 ### Subscription to URL changes
@@ -120,14 +120,14 @@ location.forward(); // = location.go(+1);
 
 ### Custom behavior
 
-The interaction of a `Location` instance with `window.history` or `window.location` is isolated in a number of methods that can be overriden in descendant classes to apply custom behavior. These methods are: `initialize()`, `transition()`, `go()`, `deriveHref()`.
+The interaction of a `NavigationLocation` instance with `window.history` or `window.location` is isolated in a number of methods that can be overriden in descendant classes to apply custom behavior. These methods are: `initialize()`, `transition()`, `go()`, `deriveHref()`.
 
-For example: By default, a `Location` instance derives its `href` from the `pathname`, `search`, and `hash` portions of the URL combined. To make a `Location` instance disregard the URL `search` and `hash`, the `Location` class can be extended to redefine the `deriveHref()` method:
+By default, a `NavigationLocation` instance derives its `href` from the `pathname`, `search`, and `hash` portions of the URL combined. To make a `NavigationLocation` instance disregard the URL `search` and `hash`, the `NavigationLocation` class can be extended to redefine the `deriveHref()` method:
 
 ```js
-import { Location, getPath } from 'navloc';
+import { NavigationLocation, getPath } from 'navloc';
 
-export class PathLocation extends Location {
+export class PathLocation extends NavigationLocation {
     deriveHref(location) {
         return getPath(location, { search: false, hash: false });
     }

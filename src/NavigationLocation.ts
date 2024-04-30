@@ -24,7 +24,7 @@ const toLocationEvent = (event: EventManagerEvent): LocationEvent => {
     };
 }
 
-export class Location {
+export class NavigationLocation {
     href: LocationString;
     eventManager: EventManager;
 

@@ -1,5 +1,5 @@
 import {SimpleURL} from './lib/IsomorphicURL';
-import {Location} from './src/Location';
+import {NavigationLocation} from './src/NavigationLocation';
 import {getPath} from './src/getPath';
 import type {LocationString} from './src/types';
 
@@ -77,7 +77,7 @@ console.assert(getPath('https://example.com/x/test') === '/x/test', 'simple nest
 console.assert(getPath('https://example.com/x/test?q=value') === '/x/test?q=value', 'path with param');
 console.assert(getPath('https://example.com/x/test?q=value', {search: false}) === '/x/test', 'path with disregarded param');
 
-class PathLocation extends Location {
+class PathLocation extends NavigationLocation {
     deriveHref(location?: LocationString) {
         return getPath(location, {search: false, hash: false});
     }
@@ -85,7 +85,7 @@ class PathLocation extends Location {
 
 let locationURL = '/x/test?q=value#hash-hash';
 
-const location = new Location(locationURL);
+const location = new NavigationLocation(locationURL);
 const pathLocation = new PathLocation(locationURL);
 
 console.log('Location vs PathLocation: initial href');
@@ -103,8 +103,8 @@ locationURL = '/y/test?q=none';
 location.assign(locationURL);
 pathLocation.assign(locationURL);
 
-console.log('Location vs PathLocation: assigned href');
-console.assert(location.href === locationURL, 'Location href');
+console.log('NavigationLocation vs PathLocation: assigned href');
+console.assert(location.href === locationURL, 'NavigationLocation href');
 console.assert(pathLocation.href === locationURL.split('?')[0], 'PathLocation href');
 
 let match = location.match(/^\/(?<section>\w)\/(?<subsection>\w+)\/?\?q=(?<value>[^&]+)/)!;
