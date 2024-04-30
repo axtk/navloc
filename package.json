@@ -1,5 +1,5 @@
 {
-  "name": "histloc",
+  "name": "navloc",
   "version": "5.0.1",
   "description": "A window.location-like browser history location implementation with events",
   "main": "dist/index.js",
