@@ -1,6 +1,6 @@
-[![npm](https://img.shields.io/npm/v/histloc?labelColor=royalblue&color=royalblue&style=flat-square)](https://www.npmjs.com/package/histloc) [![GitHub](https://img.shields.io/badge/-GitHub-royalblue?labelColor=royalblue&color=royalblue&style=flat-square&logo=github)](https://github.com/axtk/histloc) ![browser](https://img.shields.io/badge/browser-✓-345?labelColor=345&color=345&style=flat-square) ![TypeScript](https://img.shields.io/badge/TypeScript-✓-345?labelColor=345&color=345&style=flat-square)
+[![npm](https://img.shields.io/npm/v/navloc?labelColor=royalblue&color=royalblue&style=flat-square)](https://www.npmjs.com/package/navloc) [![GitHub](https://img.shields.io/badge/-GitHub-royalblue?labelColor=royalblue&color=royalblue&style=flat-square&logo=github)](https://github.com/axtk/navloc) ![browser](https://img.shields.io/badge/browser-✓-345?labelColor=345&color=345&style=flat-square) ![TypeScript](https://img.shields.io/badge/TypeScript-✓-345?labelColor=345&color=345&style=flat-square)
 
-# histloc
+# navloc
 
 The `Location` class introduced in this package produces a browser history location object with an API similar to `window.location` (`.href`, `.assign()`, `.replace()`).
 
@@ -11,7 +11,7 @@ As an extension to the `window.location` interface, this class exposes methods f
 ### Initialization
 
 ```js
-import {Location} from 'histloc';
+import { Location } from 'navloc';
 export const location = new Location();
 ```
 
@@ -21,7 +21,7 @@ Adding a handler of an exact URL path:
 
 ```js
 // We are using the `location` instance declared above.
-let locationListener = location.addListener('/home', ({href}) => {
+let locationListener = location.addListener('/home', ({ href }) => {
     console.log(href);
 });
 ```
@@ -29,7 +29,7 @@ let locationListener = location.addListener('/home', ({href}) => {
 of a specific URL path pattern:
 
 ```js
-location.addListener(/^\/section\/(?<id>\d+)\/?$/, ({href, params}) => {
+location.addListener(/^\/section\/(?<id>\d+)\/?$/, ({ href, params }) => {
     console.log(href, params.id);
 });
 ```
@@ -43,7 +43,7 @@ locationListener.remove();
 Tracking all location changes:
 
 ```js
-let unsubscribe = location.onChange(({href}) => {
+let unsubscribe = location.onChange(({ href }) => {
     console.log(href);
 });
 ```
@@ -62,7 +62,7 @@ Checking a location pattern (or an array thereof) if it matches the current path
 // Provided that the current location is '/item/42':
 location.match('/home'); // null
 location.match('/item/42'); // {}
-location.match(/^\/item\/(?<id>\d+)\/?$/); // {0: '42', id: '42'}
+location.match(/^\/item\/(?<id>\d+)\/?$/); // { 0: '42', id: '42' }
 
 location.matches('/home'); // false
 location.matches('/item/42'); // true
@@ -79,8 +79,8 @@ location.evaluate(/^\/item\/(?<id>\d+)\/?$/, 5); // 5
 
 // If the second or the third argument is a function it will be called
 // with `{href, params}` as its argument.
-location.evaluate('/home', () => 1, ({href}) => href); // '/item/42'
-location.evaluate(/^\/item\/(?<id>\d+)\/?$/, ({params}) => params.id);
+location.evaluate('/home', () => 1, ({ href }) => href); // '/item/42'
+location.evaluate(/^\/item\/(?<id>\d+)\/?$/, ({ params }) => params.id);
 // 42
 ```
 
@@ -125,11 +125,11 @@ The interaction of a `Location` instance with `window.history` or `window.locati
 For example: By default, a `Location` instance derives its `href` from the `pathname`, `search`, and `hash` portions of the URL combined. To make a `Location` instance disregard the URL `search` and `hash`, the `Location` class can be extended to redefine the `deriveHref()` method:
 
 ```js
-import {Location, getPath} from 'histloc';
+import { Location, getPath } from 'navloc';
 
 export class PathLocation extends Location {
     deriveHref(location) {
-        return getPath(location, {search: false, hash: false});
+        return getPath(location, { search: false, hash: false });
     }
 }
 ```
