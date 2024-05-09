@@ -1,6 +1,6 @@
 import {SimpleURL} from './lib/SimpleURL';
-import {NavigationLocation} from './src/NavigationLocation';
 import {getPath} from './src/getPath';
+import {NavigationLocation} from './src/NavigationLocation';
 import type {LocationString} from './src/types';
 
 let url, urlProps;
@@ -14,7 +14,7 @@ urlProps = {
     search: '?d=e',
 };
 
-console.log(`new SimpleURL('https://c.cc:80/a/b/c?d=e#hi')`);
+console.log('new SimpleURL(\'https://c.cc:80/a/b/c?d=e#hi\')');
 for (let [k, v] of Object.entries(urlProps))
     console.assert(url[k as keyof SimpleURL] === v, k);
 
@@ -27,7 +27,7 @@ urlProps = {
     search: '',
 };
 
-console.log(`new SimpleURL('https://c.cc/x/yz#hi', 'https://example.com')`);
+console.log('new SimpleURL(\'https://c.cc/x/yz#hi\', \'https://example.com\')');
 for (let [k, v] of Object.entries(urlProps))
     console.assert(url[k as keyof SimpleURL] === v, k);
 
@@ -40,7 +40,7 @@ urlProps = {
     search: '?q=123&a=b',
 };
 
-console.log(`new SimpleURL('/x/yz?q=123&a=b', 'https://example.com')`);
+console.log('new SimpleURL(\'/x/yz?q=123&a=b\', \'https://example.com\')');
 for (let [k, v] of Object.entries(urlProps))
     console.assert(url[k as keyof SimpleURL] === v, k);
 
@@ -53,11 +53,11 @@ urlProps = {
     search: '',
 };
 
-console.log(`new SimpleURL('test', 'https://example.com/x')`);
+console.log('new SimpleURL(\'test\', \'https://example.com/x\')');
 for (let [k, v] of Object.entries(urlProps))
     console.assert(url[k as keyof SimpleURL] === v, k);
 
-// @ts-ignore numeric arg instead of string
+// @ts-expect-error -- numeric param instead of string
 url = new SimpleURL(10, 'https://example.com');
 urlProps = {
     hash: '',
@@ -67,7 +67,7 @@ urlProps = {
     search: '',
 };
 
-console.log(`new SimpleURL(10, 'https://example.com')`);
+console.log('new SimpleURL(10, \'https://example.com\')');
 for (let [k, v] of Object.entries(urlProps))
     console.assert(url[k as keyof SimpleURL] === v, k);
 
@@ -123,9 +123,9 @@ console.assert(JSON.stringify(location.match('/item/42')) === '{}', 'string matc
 console.assert(JSON.stringify(location.match(/^\/item\/(?<id>\d+)\/?$/)) === '{"0":"42","id":"42"}', 'regexp match');
 
 console.log('.matches()');
-console.assert(location.matches('/home') === false, 'boolean mismatch');
-console.assert(location.matches('/item/42') === true, 'boolean string match');
-console.assert(location.matches(/^\/item\/(?<id>\d+)\/?$/) === true, 'boolean regexp match');
+console.assert(!location.matches('/home'), 'boolean mismatch');
+console.assert(location.matches('/item/42'), 'boolean string match');
+console.assert(location.matches(/^\/item\/(?<id>\d+)\/?$/), 'boolean regexp match');
 
 console.log('.evaluate()');
 console.assert(location.evaluate('/home', 1, 0) === 0, 'eval mismatch');
@@ -133,5 +133,11 @@ console.assert(location.evaluate('/item/42', 'a', 'b') === 'a', 'eval match');
 console.assert(location.evaluate(/^\/item\/(?<id>\d+)\/?$/, 5) === 5, 'regexp eval match');
 
 console.log('.evaluate() fn');
-console.assert(location.evaluate('/home', () => 1, ({href}) => href) === '/item/42', 'eval fn string mismatch');
-console.assert(location.evaluate(/^\/item\/(?<id>\d+)\/?$/, ({params}) => params.id) === '42', 'eval fn regexp match');
+console.assert(
+    location.evaluate('/home', () => 1, ({href}) => href) === '/item/42',
+    'eval fn string mismatch',
+);
+console.assert(
+    location.evaluate(/^\/item\/(?<id>\d+)\/?$/, ({params}) => params.id) === '42',
+    'eval fn regexp match',
+);

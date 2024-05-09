@@ -11,7 +11,8 @@ As an extension to the `window.location` interface, this class exposes methods f
 ### Initialization
 
 ```js
-import { NavigationLocation } from 'navloc';
+import {NavigationLocation} from 'navloc';
+
 export const location = new NavigationLocation();
 ```
 
@@ -21,7 +22,7 @@ Adding a handler of an exact URL path:
 
 ```js
 // We are using the `location` instance declared above.
-let locationListener = location.addListener('/home', ({ href }) => {
+let locationListener = location.addListener('/home', ({href}) => {
     console.log(href);
 });
 ```
@@ -29,7 +30,7 @@ let locationListener = location.addListener('/home', ({ href }) => {
 of a specific URL path pattern:
 
 ```js
-location.addListener(/^\/section\/(?<id>\d+)\/?$/, ({ href, params }) => {
+location.addListener(/^\/section\/(?<id>\d+)\/?$/, ({href, params}) => {
     console.log(href, params.id);
 });
 ```
@@ -43,7 +44,7 @@ locationListener.remove();
 Tracking all location changes:
 
 ```js
-let unsubscribe = location.onChange(({ href }) => {
+let unsubscribe = location.onChange(({href}) => {
     console.log(href);
 });
 ```
@@ -79,8 +80,8 @@ location.evaluate(/^\/item\/(?<id>\d+)\/?$/, 5); // 5
 
 // If the second or the third parameter is a function it will be
 // called with `{ href, params }` as its parameter.
-location.evaluate('/home', () => 1, ({ href }) => href); // '/item/42'
-location.evaluate(/^\/item\/(?<id>\d+)\/?$/, ({ params }) => params.id);
+location.evaluate('/home', () => 1, ({href}) => href); // '/item/42'
+location.evaluate(/^\/item\/(?<id>\d+)\/?$/, ({params}) => params.id);
 // 42
 ```
 
@@ -125,11 +126,11 @@ The interaction of a `NavigationLocation` instance with `window.history` or `win
 By default, a `NavigationLocation` instance derives its `href` from the `pathname`, `search`, and `hash` portions of the URL combined. To make a `NavigationLocation` instance disregard the URL `search` and `hash`, the `NavigationLocation` class can be extended to redefine the `deriveHref()` method:
 
 ```js
-import { NavigationLocation, getPath } from 'navloc';
+import {getPath, NavigationLocation} from 'navloc';
 
 export class PathLocation extends NavigationLocation {
     deriveHref(location) {
-        return getPath(location, { search: false, hash: false });
+        return getPath(location, {search: false, hash: false});
     }
 }
 ```
