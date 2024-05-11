@@ -63,7 +63,7 @@ Checking a location pattern (or an array thereof) if it matches the current path
 // Provided that the current location is '/item/42':
 location.match('/home'); // null
 location.match('/item/42'); // {}
-location.match(/^\/item\/(?<id>\d+)\/?$/); // { 0: '42', id: '42' }
+location.match(/^\/item\/(?<id>\d+)\/?$/); // {0: '42', id: '42'}
 
 location.matches('/home'); // false
 location.matches('/item/42'); // true
