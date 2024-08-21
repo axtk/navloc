@@ -1,7 +1,6 @@
 import {IsomorphicURL} from '../lib/IsomorphicURL';
+import {syntheticOrigin} from '../lib/syntheticOrigin';
 import type {LocationString, PathProps} from './types';
-
-const SYNTHETIC_ORIGIN = 'https://c.cc';
 
 export const getPath = (
     location: LocationString,
@@ -9,7 +8,7 @@ export const getPath = (
 ): LocationString => {
     let url = location === undefined || location === null
         ? typeof window === 'undefined' ? undefined : new IsomorphicURL(window.location.href)
-        : new IsomorphicURL(location, SYNTHETIC_ORIGIN);
+        : new IsomorphicURL(location, syntheticOrigin);
 
     if (!url) return;
 

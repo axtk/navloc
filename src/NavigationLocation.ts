@@ -4,6 +4,8 @@ import {
     MatchParams,
     matchPattern,
 } from 'evtm';
+import {IsomorphicURL} from '../lib/IsomorphicURL';
+import {syntheticOrigin} from '../lib/syntheticOrigin';
 import {getPath} from './getPath';
 import {isSameOrigin} from './isSameOrigin';
 import {Transition, TransitionType} from './Transition';
@@ -187,6 +189,22 @@ export class NavigationLocation {
 
     forward(): void {
         this.go(1);
+    }
+
+    _getURLComponent(key: 'pathname' | 'search' | 'hash') {
+        return new IsomorphicURL(this.href || '', syntheticOrigin)[key];
+    }
+
+    get pathname() {
+        return this._getURLComponent('pathname');
+    }
+
+    get search() {
+        return this._getURLComponent('search');
+    }
+
+    get hash() {
+        return this._getURLComponent('hash');
     }
 
     /**
