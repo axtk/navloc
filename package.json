@@ -25,7 +25,7 @@
   "author": "axtk",
   "license": "MIT",
   "dependencies": {
-    "evtm": "4.2.3"
+    "evtm": "4.2.4"
   },
   "devDependencies": {
     "esbuild": "0.24.0",
